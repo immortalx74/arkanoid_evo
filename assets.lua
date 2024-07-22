@@ -6,6 +6,7 @@ local assets = {}
 function assets.load()
 	assets[ ASSET_TYPE.PADDLE ] = lovr.graphics.newModel( "devres/paddle.glb" )
 	assets[ ASSET_TYPE.PADDLE_TOP ] = lovr.graphics.newModel( "devres/paddle_top.glb" )
+	assets[ ASSET_TYPE.PADDLE_SPINNER ] = lovr.graphics.newModel( "devres/spinner.glb" )
 	assets[ ASSET_TYPE.ROOM ] = lovr.graphics.newModel( "devres/room.glb" )
 	assets[ ASSET_TYPE.ROOM_GLASS ] = lovr.graphics.newModel( "devres/glass.glb" )
 	assets[ ASSET_TYPE.SHADER_PBR ] = lovr.graphics.newShader( "devres/shader_PBR.vs", "devres/shader_PBR.fs", { flags = { glow = true, normalMap = true, vertexTangents = false, tonemap = true } } )

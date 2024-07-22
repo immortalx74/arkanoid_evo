@@ -48,10 +48,15 @@ bricks = {}
 balls = {}
 paddle = nil
 cur_level = 1
-world = lovr.physics.newWorld( { tags = { "ball", "brick", "wall", "paddle" }, staticTags = { "ball", "brick", "wall", "paddle" }, maxColliders = 512, threadSafe = false, tickRate = 80, maxPenetration = 0.01 } )
+walls = {}
+world = lovr.physics.newWorld( {
+	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_back", "wall_front" },
+	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_back", "wall_front" },
+	maxColliders = 512,
+	threadSafe = false,
+	tickRate = 80,
+	maxPenetration = 0.01
+} )
 world:disableCollisionBetween( "brick", "brick" )
-world:disableCollisionBetween( "wall", "wall" )
 world:disableCollisionBetween( "ball", "ball" )
-world:disableCollisionBetween( "brick", "wall" )
 world:disableCollisionBetween( "brick", "paddle" )
-world:disableCollisionBetween( "wall", "paddle" )

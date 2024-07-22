@@ -8,6 +8,7 @@ function lovr.load()
 	assets.load_levels()
 
 	obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE )
+	obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER )
 	obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
 	obj_room = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM )
 	obj_room_glass = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM_GLASS, true )
@@ -16,7 +17,7 @@ end
 
 function lovr.keypressed( key, scancode, rep )
 	if key == "return" then
-		aaa = true
+
 	end
 end
 

@@ -16,7 +16,7 @@ function gameobject:new( pose, type, transparent, color )
 	obj.transparent = transparent or false
 	obj.color = color or false
 	if type == ASSET_TYPE.BALL then
-		obj.velocity = 0.8
+		obj.velocity = 3
 		obj.direction = lovr.math.newVec3( 0.5, -0.2, -1 )
 		obj.collider = world:newSphereCollider( lovr.math.newVec3( obj.pose ), 0.03 )
 		obj.collider:setTag( "ball" )
@@ -28,13 +28,13 @@ function gameobject:new( pose, type, transparent, color )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
 	elseif type == ASSET_TYPE.ROOM then
-		obj.collider = world:newCollider( 0, 0, 0 )
-		util.setup_room_collider_shapes( obj.collider )
-		obj.collider:setTag( "wall" )
-		obj.collider:setUserData( obj )
-		obj.collider:setSensor( true )
+		util.setup_room_colliders()
+		for i, v in ipairs( walls ) do
+			v:setUserData( obj )
+			v:setSensor( true )
+		end
 	elseif type == ASSET_TYPE.PADDLE then
-		local length = 0.2
+		local length = 0.02
 		local half_length = length / 2
 		obj.collider = world:newCylinderCollider( 0, 0, 0, 0.14, length )
 		obj.collider:getShapes()[ 1 ]:setOffset( 0, length / 2, 0, math.pi / 2, 1, 0, 0 )
@@ -50,29 +50,31 @@ end
 
 function gameobject:update( dt )
 	if self.type == ASSET_TYPE.BALL then
-		-- if aaa then
-		-- 	local n = vec3( 0, 0, -1 )
-		-- 	local d = self.direction:dot( n )
-		-- 	local reflected = self.direction:sub( n:mul( 2 * d ) )
-		-- 	self.direction:set( reflected )
-		-- 	aaa = false
-		-- end
-
 		local v = vec3( self.direction * self.velocity * dt )
 		self.pose:translate( v )
 		self.collider:setPosition( vec3( self.pose ) )
 
 		util.brick_collision( self )
 		util.wall_collision( self )
+		util.paddle_collision( self )
 	elseif self.type == ASSET_TYPE.PADDLE then
 		local x, y, z, angle, ax, ay, az = lovr.headset.getPose( "right" )
 		obj_paddle.pose:set( vec3( x, y, z ), quat( angle, ax, ay, az ) )
 		obj_paddle_top.pose:set( vec3( x, y, z ), quat( angle, ax, ay, az ) )
+
+		obj_paddle_spinner.model:animate( 1, lovr.timer.getTime() )
+		obj_paddle_spinner.pose:set( vec3( x, y, z ), quat( angle, ax, ay, az ) )
 		obj_paddle.collider:setPose( vec3( x, y, z ), quat( angle, ax, ay, az ) )
 	end
 end
 
 function gameobject:draw( pass )
+	if lovr.headset.wasPressed( "hand/right", "trigger" ) then
+		balls[ 1 ].pose:set( vec3( 0, 1.4, -2 ) )
+		balls[ 1 ].direction:set( 0.5, -0.2, -1 )
+		balls[ 1 ].collider:setPosition( vec3( balls[ 1 ].pose ) )
+	end
+
 	if self.transparent then
 		pass:setShader()
 	else
