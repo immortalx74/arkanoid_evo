@@ -21,7 +21,6 @@ function lovr.keypressed( key, scancode, rep )
 end
 
 function lovr.update( dt )
-	-- world:update( 200 )
 	if game_state == GAME_STATE.GENERATE_LEVEL then
 		util.generate_level()
 		game_state = GAME_STATE.PLAY
@@ -40,6 +39,6 @@ function lovr.draw( pass )
 
 	if game_state == GAME_STATE.PLAY then
 		gameobject.draw_all( pass )
-		-- util.draw_room_colliders( pass )
+		util.draw_room_colliders( pass )
 	end
 end

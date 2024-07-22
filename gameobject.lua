@@ -17,7 +17,7 @@ function gameobject:new( pose, type, transparent, color )
 	obj.color = color or false
 	if type == ASSET_TYPE.BALL then
 		obj.velocity = 0.8
-		obj.direction = lovr.math.newVec3( 0.4, -0.2, -1 )
+		obj.direction = lovr.math.newVec3( 0.5, -0.2, -1 )
 		obj.collider = world:newSphereCollider( lovr.math.newVec3( obj.pose ), 0.03 )
 		obj.collider:setTag( "ball" )
 		obj.collider:setUserData( obj )
@@ -33,6 +33,14 @@ function gameobject:new( pose, type, transparent, color )
 		obj.collider:setTag( "wall" )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
+	elseif type == ASSET_TYPE.PADDLE then
+		local length = 0.2
+		local half_length = length / 2
+		obj.collider = world:newCylinderCollider( 0, 0, 0, 0.14, length )
+		obj.collider:getShapes()[ 1 ]:setOffset( 0, length / 2, 0, math.pi / 2, 1, 0, 0 )
+		obj.collider:setTag( "paddle" )
+		obj.collider:setUserData( obj )
+		obj.collider:setSensor( true )
 	end
 
 	table.insert( gameobjects_list, obj )
@@ -42,43 +50,25 @@ end
 
 function gameobject:update( dt )
 	if self.type == ASSET_TYPE.BALL then
-		if aaa then
-			local n = vec3( 0, 0, -1 ):normalize()
-			local d = self.direction:dot( n )
-			local reflected = self.direction:sub( n:mul( 2 * d ) )
-			self.direction:set( reflected )
-			aaa = false
-		end
+		-- if aaa then
+		-- 	local n = vec3( 0, 0, -1 )
+		-- 	local d = self.direction:dot( n )
+		-- 	local reflected = self.direction:sub( n:mul( 2 * d ) )
+		-- 	self.direction:set( reflected )
+		-- 	aaa = false
+		-- end
+
 		local v = vec3( self.direction * self.velocity * dt )
 		self.pose:translate( v )
 		self.collider:setPosition( vec3( self.pose ) )
-		local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( self.collider:getShapes()[ 1 ], vec3( self.pose ), quat( self.pose ), "brick wall" )
 
-		if collider then
-			if collider:getTag() == "brick" then
-				local o = collider:getUserData()
-				o:destroy()
-
-				-- TODO: Currently reflecting from front of brick only.
-				-- Need to determine which side of brick was hit
-				self.direction:set( util.reflection_vector( vec3( 0, 0, -1 ), self.direction ) )
-			elseif collider:getTag() == "wall" then
-				local n
-				if shape:getUserData() == "right" then
-					n = vec3( -1, 0, 0 ):normalize()
-				elseif shape:getUserData() == "left" then
-					n = vec3( 1, 0, 0 ):normalize()
-				elseif shape:getUserData() == "top" then
-					n = vec3( 0, -1, 0 ):normalize()
-				elseif shape:getUserData() == "bottom" then
-					n = vec3( 0, 1, 0 ):normalize()
-				end
-
-				if n then
-					self.direction:set( util.reflection_vector( n, self.direction ) )
-				end
-			end
-		end
+		util.brick_collision( self )
+		util.wall_collision( self )
+	elseif self.type == ASSET_TYPE.PADDLE then
+		local x, y, z, angle, ax, ay, az = lovr.headset.getPose( "right" )
+		obj_paddle.pose:set( vec3( x, y, z ), quat( angle, ax, ay, az ) )
+		obj_paddle_top.pose:set( vec3( x, y, z ), quat( angle, ax, ay, az ) )
+		obj_paddle.collider:setPose( vec3( x, y, z ), quat( angle, ax, ay, az ) )
 	end
 end
 
