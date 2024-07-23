@@ -3,6 +3,7 @@ local util = {}
 package.loaded[ ... ] = util
 
 local gameobject = require "gameobject"
+local assets = require "assets"
 
 function util.split( input )
 	local stripped = input:gsub( "[\r\n,]", "" ) -- Remove newlines and commas
@@ -56,6 +57,8 @@ function util.brick_collision( cur_ball )
 			-- TODO: Currently reflecting from front of brick only.
 			-- Need to determine which side of brick was hit
 			cur_ball.direction:set( util.reflection_vector( vec3( 0, 0, -1 ), cur_ball.direction ) )
+			assets[ ASSET_TYPE.SND_BALL_BRICK_DESTROY ]:stop()
+			assets[ ASSET_TYPE.SND_BALL_BRICK_DESTROY ]:play()
 		end
 	end
 end
@@ -69,22 +72,26 @@ function util.wall_collision( cur_ball )
 			local n = vec3()
 			local cur_ball_pos = vec3( cur_ball.pose )
 			if collider:getTag() == "wall_right" then
-				-- cur_ball.pose:set( vec3( 1.1 - 0.2, cur_ball_pos.y, cur_ball_pos.z ) )
+				cur_ball.pose:set( vec3( 1.1 - 0.1, cur_ball_pos.y, cur_ball_pos.z ) )
+				cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
 				n:set( -1, 0, 0 )
 			elseif collider:getTag() == "wall_left" then
-				-- cur_ball.pose:set( vec3( -1.1 + 0.2, cur_ball_pos.y, cur_ball_pos.z ) )
+				cur_ball.pose:set( vec3( -1.1 + 0.1, cur_ball_pos.y, cur_ball_pos.z ) )
+				cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
 				n:set( 1, 0, 0 )
 			elseif collider:getTag() == "wall_top" then
-				-- cur_ball.pose:set( vec3( cur_ball_pos.x, 1.1 - 0.2, cur_ball_pos.z ) )
+				cur_ball.pose:set( vec3( cur_ball_pos.x, 2.2 - 0.1, cur_ball_pos.z ) )
+				cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
 				n:set( 0, -1, 0 )
 			elseif collider:getTag() == "wall_bottom" then
-				-- cur_ball.pose:set( vec3( cur_ball_pos.x, 0.2, cur_ball_pos.z ) )
+				cur_ball.pose:set( vec3( cur_ball_pos.x, 0.1, cur_ball_pos.z ) )
+				cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
 				n:set( 0, 1, 0 )
 			elseif collider:getTag() == "wall_back" then
 				-- cur_ball.pose:set( vec3( cur_ball_pos.x, cur_ball_pos.y, -0.2 ) )
 				n:set( 0, 0, -1 )
 			elseif collider:getTag() == "wall_front" then
-				-- cur_ball.pose:set( vec3( cur_ball_pos.x, cur_ball_pos.y, -10 + 0.2 ) )
+				-- cur_ball.pose:set( vec3( cur_ball_pos.x, cur_ball_pos.y, -4 + 0.2 ) )
 				n:set( 0, 0, 1 )
 			else
 				print( "no tag" )
@@ -96,12 +103,26 @@ function util.wall_collision( cur_ball )
 end
 
 function util.paddle_collision( cur_ball )
-	local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( cur_ball.collider:getShapes()[ 1 ], vec3( cur_ball.pose ), quat( cur_ball.pose ), "paddle" )
+	if paddle_settings.contacted then
+		if paddle_settings.counter >= paddle_settings.frames_innactive then
+			paddle_settings.contacted = false
+			paddle_settings.counter = 0
+			return
+		else
+			paddle_settings.counter = paddle_settings.counter + 1
+			return
+		end
+	else
+		local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( cur_ball.collider:getShapes()[ 1 ], vec3( cur_ball.pose ), quat( cur_ball.pose ), "paddle" )
 
-	if collider then
-		if collider:getTag() == "paddle" then
-			local dir = quat( obj_paddle.pose ):direction()
-			cur_ball.direction:set( util.reflection_vector( dir, -cur_ball.direction ) )
+		if collider then
+			if collider:getTag() == "paddle" then
+				local dir = quat( obj_paddle.pose ):direction()
+				cur_ball.direction:set( util.reflection_vector( dir, -cur_ball.direction ) )
+				paddle_settings.contacted = true
+				assets[ ASSET_TYPE.SND_BALL_TO_PADDLE ]:stop()
+				assets[ ASSET_TYPE.SND_BALL_TO_PADDLE ]:play()
+			end
 		end
 	end
 end
@@ -128,18 +149,19 @@ function util.setup_room_colliders( collider )
 	bottom:setOrientation( quat( m ) )
 	bottom:setTag( "wall_bottom" )
 
-	local back = world:newBoxCollider( 0, 1.1, -5 - half_thickness, 2.2, 2.2, thickness )
+	-- NOTE: Moved closer for testing
+	local back = world:newBoxCollider( 0, 1.1, -3.3 - half_thickness, 2.2, 2.2, thickness )
 	back:setTag( "wall_back" )
 
 	local front = world:newBoxCollider( 0, 1.1, 0 + half_thickness, 2.2, 2.2, thickness )
 	front:setTag( "wall_front" )
 
-	table.insert( walls, right )
-	table.insert( walls, left )
-	table.insert( walls, top )
-	table.insert( walls, bottom )
-	table.insert( walls, back )
-	table.insert( walls, front )
+	table.insert( room_walls, right )
+	table.insert( room_walls, left )
+	table.insert( room_walls, top )
+	table.insert( room_walls, bottom )
+	table.insert( room_walls, back )
+	table.insert( room_walls, front )
 end
 
 function util.generate_level()
@@ -148,6 +170,15 @@ function util.generate_level()
 	balls = {}
 	local ball = gameobject( vec3( -0.8, 1.6, -1 ), ASSET_TYPE.BALL )
 	table.insert( balls, ball )
+
+	-- local ball = gameobject( vec3( 0.3, 1, -0.2 ), ASSET_TYPE.BALL )
+	-- table.insert( balls, ball )
+
+	-- local ball = gameobject( vec3( 0.8, 1.8, -2 ), ASSET_TYPE.BALL )
+	-- table.insert( balls, ball )
+
+	-- local ball = gameobject( vec3( 0.6, 0.8, -1 ), ASSET_TYPE.BALL )
+	-- table.insert( balls, ball )
 
 	-- w:13, h:18
 	-- brick volume
@@ -177,6 +208,8 @@ function util.generate_level()
 			left = -(2.2 / 2) + 0.047 + (0.162 / 2)
 		end
 	end
+
+	obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
 end
 
 return util

@@ -12,7 +12,20 @@ ASSET_TYPE = {
 	BRICK = 11,
 	BRICK_SILVER = 12,
 	BRICK_GOLD = 13,
-	BALL = 14
+	BALL = 14,
+	SND_BALL_BRICK_DESTROY = 15,
+	SND_BALL_BRICK_DING = 16,
+	SND_BALL_TO_PADDLE = 17,
+	SND_BALL_TO_PADDLE_STICK = 18,
+	SND_ENEMY_DESTROY = 19,
+	SND_ESCAPE_LEVEL = 20,
+	SND_GOT_LIFE = 21,
+	SND_LASER_SHOOT = 22,
+	SND_LEVEL_INTRO = 23,
+	SND_LOST_LIFE = 24,
+	SND_MOTHERSHIP_INTRO = 25,
+	SND_PADDLE_AWAY = 26,
+	SND_PADDLE_TURN_BIG = 27,
 }
 
 GAME_STATE = {
@@ -46,15 +59,15 @@ game_state = GAME_STATE.INIT
 levels = {}
 bricks = {}
 balls = {}
-paddle = nil
-cur_level = 1
-walls = {}
+room_walls = {}
+paddle_settings = { frames_innactive = 60, contacted = false, counter = 0, hand = "right" }
+cur_level = 5
 world = lovr.physics.newWorld( {
 	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_back", "wall_front" },
 	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_back", "wall_front" },
 	maxColliders = 512,
 	threadSafe = false,
-	tickRate = 80,
+	tickRate = 240,
 	maxPenetration = 0.01
 } )
 world:disableCollisionBetween( "brick", "brick" )

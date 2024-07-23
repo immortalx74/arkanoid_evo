@@ -9,9 +9,9 @@ function lovr.load()
 
 	obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE )
 	obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER )
-	obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
 	obj_room = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM )
 	obj_room_glass = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM_GLASS, true )
+	-- obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
 	game_state = GAME_STATE.GENERATE_LEVEL
 end
 

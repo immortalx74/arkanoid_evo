@@ -29,7 +29,7 @@ function gameobject:new( pose, type, transparent, color )
 		obj.collider:setSensor( true )
 	elseif type == ASSET_TYPE.ROOM then
 		util.setup_room_colliders()
-		for i, v in ipairs( walls ) do
+		for i, v in ipairs( room_walls ) do
 			v:setUserData( obj )
 			v:setSensor( true )
 		end
@@ -69,7 +69,7 @@ function gameobject:update( dt )
 end
 
 function gameobject:draw( pass )
-	if lovr.headset.wasPressed( "hand/right", "trigger" ) then
+	if lovr.headset.wasPressed( "right", "trigger" ) then
 		balls[ 1 ].pose:set( vec3( 0, 1.4, -2 ) )
 		balls[ 1 ].direction:set( 0.5, -0.2, -1 )
 		balls[ 1 ].collider:setPosition( vec3( balls[ 1 ].pose ) )

@@ -16,6 +16,21 @@ function assets.load()
 	assets[ ASSET_TYPE.BRICK_SILVER ] = lovr.graphics.newModel( "devres/brick_silver.glb" )
 	assets[ ASSET_TYPE.BRICK_GOLD ] = lovr.graphics.newModel( "devres/brick_gold.glb" )
 	assets[ ASSET_TYPE.BALL ] = lovr.graphics.newModel( "devres/ball.glb" )
+
+	assets[ ASSET_TYPE.SND_BALL_BRICK_DESTROY ] = lovr.audio.newSource( "res/sounds/ball_brick_destroy.wav" )
+	assets[ ASSET_TYPE.SND_BALL_BRICK_DING ] = lovr.audio.newSource( "res/sounds/ball_brick_ding.wav" )
+	assets[ ASSET_TYPE.SND_BALL_TO_PADDLE ] = lovr.audio.newSource( "res/sounds/ball_to_paddle.wav" )
+	assets[ ASSET_TYPE.SND_BALL_TO_PADDLE_STICK ] = lovr.audio.newSource( "res/sounds/ball_to_paddle_stick.wav" )
+	assets[ ASSET_TYPE.SND_ENEMY_DESTROY ] = lovr.audio.newSource( "res/sounds/enemy_destroy.wav" )
+	assets[ ASSET_TYPE.SND_ESCAPE_LEVEL ] = lovr.audio.newSource( "res/sounds/got_life.wav" )
+	assets[ ASSET_TYPE.SND_GOT_LIFE ] = lovr.audio.newSource( "res/sounds/laser_shoot.wav" )
+	assets[ ASSET_TYPE.SND_LASER_SHOOT ] = lovr.audio.newSource( "res/sounds/level_intro.wav" )
+	assets[ ASSET_TYPE.SND_LEVEL_INTRO ] = lovr.audio.newSource( "res/sounds/paddle_turn_big.wav" )
+	assets[ ASSET_TYPE.SND_LOST_LIFE ] = lovr.audio.newSource( "res/sounds/escape_level.wav" )
+	assets[ ASSET_TYPE.SND_MOTHERSHIP_INTRO ] = lovr.audio.newSource( "res/sounds/mothership_intro.wav" )
+	assets[ ASSET_TYPE.SND_PADDLE_AWAY ] = lovr.audio.newSource( "res/sounds/paddle_away.wav" )
+	assets[ ASSET_TYPE.SND_PADDLE_TURN_BIG ] = lovr.audio.newSource( "res/sounds/lost_life.wav" )
+
 	assets[ ASSET_TYPE.SPHERICAL_HARMONICS ] = lovr.graphics.newBuffer( { 'vec3', layout = 'std140' }, {
 		{ 0.611764907836914,  0.599504590034485,  0.479980736970901 },
 		{ 0.659514904022217,  0.665349841117859,  0.567680120468140 },
