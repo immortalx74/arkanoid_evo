@@ -150,7 +150,7 @@ function util.setup_room_colliders( collider )
 	bottom:setTag( "wall_bottom" )
 
 	-- NOTE: Moved closer for testing
-	local back = world:newBoxCollider( 0, 1.1, -3.3 - half_thickness, 2.2, 2.2, thickness )
+	local back = world:newBoxCollider( 0, 1.1, -3.5 - half_thickness, 2.2, 2.2, thickness )
 	back:setTag( "wall_back" )
 
 	local front = world:newBoxCollider( 0, 1.1, 0 + half_thickness, 2.2, 2.2, thickness )

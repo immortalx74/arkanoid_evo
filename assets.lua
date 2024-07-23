@@ -13,7 +13,7 @@ function assets.load()
 	assets[ ASSET_TYPE.SKYBOX ] = lovr.graphics.newTexture( "devres/galaxy.png" )
 	assets[ ASSET_TYPE.ENVIRONMENT_MAP ] = lovr.graphics.newTexture( 'devres/ibl.ktx' )
 	assets[ ASSET_TYPE.BRICK ] = lovr.graphics.newModel( "devres/brick.glb" )
-	assets[ ASSET_TYPE.BRICK_SILVER ] = lovr.graphics.newModel( "devres/brick_silver.glb" )
+	assets[ ASSET_TYPE.BRICK_SILVER ] = lovr.graphics.newModel( "devres/brick2.glb" )
 	assets[ ASSET_TYPE.BRICK_GOLD ] = lovr.graphics.newModel( "devres/brick_gold.glb" )
 	assets[ ASSET_TYPE.BALL ] = lovr.graphics.newModel( "devres/ball.glb" )
 
