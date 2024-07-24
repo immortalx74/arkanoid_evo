@@ -16,15 +16,15 @@ function gameobject:new( pose, type, transparent, color )
 	obj.transparent = transparent or false
 	obj.color = color or false
 	if type == ASSET_TYPE.BALL then
-		obj.velocity = 3
+		obj.velocity = 1
 		obj.direction = lovr.math.newVec3( 0.5, -0.2, -1 )
 		obj.collider = world:newSphereCollider( lovr.math.newVec3( obj.pose ), 0.03 )
 		obj.collider:setTag( "ball" )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
 	elseif type == ASSET_TYPE.BRICK or type == ASSET_TYPE.BRICK_GOLD or type == ASSET_TYPE.BRICK_SILVER then
-		-- obj.collider = world:newBoxCollider( lovr.math.newVec3( obj.pose ), vec3( 0.162, 0.084, 0.084 ) )
-		obj.collider = world:newBoxCollider( lovr.math.newVec3( obj.pose ), vec3( 0.162, 0.084, 1 ) )
+		obj.collider = world:newBoxCollider( lovr.math.newVec3( obj.pose ), vec3( 0.162, 0.084, 0.084 ) )
+		-- obj.collider = world:newBoxCollider( lovr.math.newVec3( obj.pose ), vec3( 0.162, 0.084, 1 ) )
 		obj.collider:setTag( "brick" )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )

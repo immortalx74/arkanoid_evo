@@ -52,11 +52,54 @@ function util.brick_collision( cur_ball )
 	if collider then
 		if collider:getTag() == "brick" then
 			local o = collider:getUserData()
-			o:destroy()
 
-			-- TODO: Currently reflecting from front of brick only.
-			-- Need to determine which side of brick was hit
-			cur_ball.direction:set( util.reflection_vector( vec3( 0, 0, -1 ), cur_ball.direction ) )
+			-- NOTE: test getting correct hit side (snippet credit: j_miskov)
+			-- Seems reversing left/right and up/down, but NOT forward-back gives the correct result?
+			
+			-- local cardinal_directions = {
+			-- 	{ 'up',      vec3.up },
+			-- 	{ 'down',    vec3.down },
+			-- 	{ 'left',    vec3.left },
+			-- 	{ 'right',   vec3.right },
+			-- 	{ 'forward', vec3.forward },
+			-- 	{ 'back',    vec3.back }
+			-- }
+
+			local cardinal_directions = {
+				{ 'up',      vec3.down },
+				{ 'down',    vec3.up },
+				{ 'left',    vec3.right },
+				{ 'right',   vec3.left },
+				{ 'forward', vec3.forward },
+				{ 'back',    vec3.back }
+			}
+
+			local function getDir( nx, ny, nz )
+				local n = vec3( nx, ny, nz )
+				local maxDotProduct = -math.huge
+				local bestMatch
+				for _, dir in ipairs( cardinal_directions ) do
+					local dot = n:dot( dir[ 2 ] )
+					if dot > maxDotProduct then
+						maxDotProduct = dot
+						bestMatch = dir
+					end
+				end
+				return bestMatch
+			end
+
+			local t = getDir( nx, ny, nz )
+			local str = t[ 1 ]
+			local face_normal = t[ 2 ]
+			if t then
+				os.execute("cls")
+				print( str, face_normal )
+			end
+
+
+			o:destroy()
+			cur_ball.direction:set( util.reflection_vector( face_normal, cur_ball.direction ) )
+
 			assets[ ASSET_TYPE.SND_BALL_BRICK_DESTROY ]:stop()
 			assets[ ASSET_TYPE.SND_BALL_BRICK_DESTROY ]:play()
 		end
@@ -199,7 +242,7 @@ function util.generate_level()
 				gameobject( vec3( left, top, -3 ), ASSET_TYPE.BRICK, false, PASS_COLORS[ v ] )
 			end
 
-			table.insert( bricks, { position = vec3( left, top, -3 ), color = PASS_COLORS[ v ] } )
+			-- table.insert( bricks, { position = vec3( left, top, -3 ), color = PASS_COLORS[ v ] } )
 		end
 
 		left = left + 0.162

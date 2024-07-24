@@ -68,7 +68,7 @@ world = lovr.physics.newWorld( {
 	maxColliders = 512,
 	threadSafe = false,
 	tickRate = 240,
-	maxPenetration = 0.01
+	maxPenetration = 0.02
 } )
 world:disableCollisionBetween( "brick", "brick" )
 world:disableCollisionBetween( "ball", "ball" )
