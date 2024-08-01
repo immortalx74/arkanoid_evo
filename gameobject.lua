@@ -16,7 +16,7 @@ function gameobject:new( pose, type, transparent, color )
 	obj.transparent = transparent or false
 	obj.color = color or false
 	if type == ASSET_TYPE.BALL then
-		obj.velocity = 1
+		obj.velocity = 0.5
 		obj.direction = lovr.math.newVec3( 0.5, -0.2, -1 )
 		obj.collider = world:newSphereCollider( lovr.math.newVec3( obj.pose ), 0.03 )
 		obj.collider:setTag( "ball" )
@@ -28,6 +28,13 @@ function gameobject:new( pose, type, transparent, color )
 		obj.collider:setTag( "brick" )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
+		if type == ASSET_TYPE.BRICK then
+			obj.strength = 1
+		elseif type == ASSET_TYPE.BRICK_SILVER then
+			obj.strength = 2
+		else
+			obj.strength = -1
+		end
 	elseif type == ASSET_TYPE.ROOM then
 		util.setup_room_colliders()
 		for i, v in ipairs( room_walls ) do
@@ -50,14 +57,16 @@ function gameobject:new( pose, type, transparent, color )
 end
 
 function gameobject:update( dt )
-	if self.type == ASSET_TYPE.BALL then
-		local v = vec3( self.direction * self.velocity * dt )
-		self.pose:translate( v )
-		self.collider:setPosition( vec3( self.pose ) )
+	if self.type == ASSET_TYPE.BALL  then
+		for i = 1, 6 do
+			local v = vec3( self.direction * self.velocity * dt )
+			self.pose:translate( v )
+			self.collider:setPosition( vec3( self.pose ) )
 
-		util.brick_collision( self )
-		util.wall_collision( self )
-		util.paddle_collision( self )
+			util.brick_collision( self )
+			util.wall_collision( self )
+			util.paddle_collision( self )
+		end
 	elseif self.type == ASSET_TYPE.PADDLE then
 		local x, y, z, angle, ax, ay, az = lovr.headset.getPose( "right" )
 		obj_paddle.pose:set( vec3( x, y, z ), quat( angle, ax, ay, az ) )

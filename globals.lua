@@ -1,3 +1,5 @@
+local timer = require "timer"
+
 ASSET_TYPE = {
 	PADDLE = 1,
 	PADDLE_TOP = 2,
@@ -34,7 +36,7 @@ GAME_STATE = {
 	PLAY = 3
 }
 
-PASS_COLORS = {
+BRICK_COLORS = {
 	[ "w" ] = { 1, 1, 1 },
 	[ "o" ] = { 1, 0.56, 0 },
 	[ "c" ] = { 0, 1, 1 },
@@ -60,16 +62,18 @@ levels = {}
 bricks = {}
 balls = {}
 room_walls = {}
-paddle_settings = { frames_innactive = 60, contacted = false, counter = 0, hand = "right" }
-cur_level = 5
+player = { cooldown_interval = 1, contacted = false, hand = "right", cooldown_timer = timer( false ) }
+cur_level = 17
 world = lovr.physics.newWorld( {
 	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_back", "wall_front" },
 	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_back", "wall_front" },
 	maxColliders = 512,
 	threadSafe = false,
-	tickRate = 240,
+	tickRate = 480,
 	maxPenetration = 0.02
 } )
 world:disableCollisionBetween( "brick", "brick" )
 world:disableCollisionBetween( "ball", "ball" )
 world:disableCollisionBetween( "brick", "paddle" )
+paused = false
+print( lovr.headset.getRefreshRates() )

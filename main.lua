@@ -17,7 +17,7 @@ end
 
 function lovr.keypressed( key, scancode, rep )
 	if key == "return" then
-
+		paused = not paused
 	end
 end
 
