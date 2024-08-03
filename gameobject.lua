@@ -15,8 +15,9 @@ function gameobject:new( pose, type, transparent, color )
 	obj.model = assets[ type ]
 	obj.transparent = transparent or false
 	obj.color = color or false
+
 	if type == ASSET_TYPE.BALL then
-		obj.velocity = 2 / METRICS.SUBSTEPS
+		obj.velocity = 2.8 / METRICS.SUBSTEPS
 		obj.direction = lovr.math.newVec3( 0.5, -0.2, -1 )
 		obj.collider = world:newSphereCollider( lovr.math.newVec3( obj.pose ), METRICS.BALL_RADIUS )
 		obj.collider:setTag( "ball" )
@@ -47,6 +48,9 @@ function gameobject:new( pose, type, transparent, color )
 		obj.collider:setTag( "paddle" )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
+	elseif type >= ASSET_TYPE.POWERUP_B and type <= ASSET_TYPE.POWERUP_S then
+		obj.collider = world:newCylinderCollider( lovr.math.newVec3( obj.pose ), METRICS.POWERUP_RADIUS, METRICS.POWERUP_LENGTH )
+		obj.collider:setOrientation( math.pi / 2, 0, 1, 0 )
 	end
 
 	table.insert( gameobjects_list, obj )
@@ -78,7 +82,6 @@ function gameobject:update( dt )
 			obj_paddle_spinner.pose:set( vec3( v_stp ), quat( q_stp ) )
 			obj_paddle.collider:setPose( vec3( v_stp ), quat( q_stp ) )
 
-
 			local v = vec3( self.direction * self.velocity * dt )
 			self.pose:translate( v )
 			self.collider:setPosition( vec3( self.pose ) )
@@ -94,8 +97,8 @@ function gameobject:update( dt )
 				break
 			end
 		end
-	elseif self.type == ASSET_TYPE.PADDLE then
-
+	elseif self.type >= ASSET_TYPE.POWERUP_B and self.type <= ASSET_TYPE.POWERUP_S then
+		self.collider:setPosition( vec3( self.pose ) )
 	end
 end
 
@@ -111,6 +114,8 @@ function gameobject:draw( pass )
 	end
 
 	if self.type == ASSET_TYPE.PADDLE_SPINNER then
+		self.model:animate( 1, lovr.timer.getTime() )
+	elseif self.type >= ASSET_TYPE.POWERUP_B and self.type <= ASSET_TYPE.POWERUP_S then
 		self.model:animate( 1, lovr.timer.getTime() )
 	end
 

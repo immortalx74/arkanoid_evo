@@ -39,6 +39,6 @@ function lovr.draw( pass )
 
 	if game_state == GAME_STATE.PLAY then
 		gameobject.draw_all( pass )
-		phywire.draw( pass, world )
+		-- phywire.draw( pass, world )
 	end
 end

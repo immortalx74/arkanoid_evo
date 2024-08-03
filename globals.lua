@@ -29,6 +29,13 @@ ASSET_TYPE = {
 	SND_MOTHERSHIP_INTRO = 25,
 	SND_PADDLE_AWAY = 26,
 	SND_PADDLE_TURN_BIG = 27,
+	POWERUP_B = 28,
+	POWERUP_C = 29,
+	POWERUP_D = 30,
+	POWERUP_E = 31,
+	POWERUP_L = 32,
+	POWERUP_P = 33,
+	POWERUP_S = 34,
 }
 
 GAME_STATE = {
@@ -52,12 +59,16 @@ BRICK_COLORS = {
 METRICS = {
 	ROOM_WIDTH = 2.2,
 	ROOM_HEIGHT = 2.2,
-	ROOM_DEPTH = 3.5,
+	ROOM_DEPTH = 4,
 
 	BRICK_WIDTH = 0.162,
 	BRICK_HEIGHT = 0.084,
-	BRICK_DEPTH = 0.084,
-	BRICK_DIST_Z = 3,
+	-- BRICK_DEPTH = 0.084,
+	BRICK_DEPTH = 0.5,
+	BRICK_DIST_Z = 3.4,
+
+	POWERUP_RADIUS = 0.042,
+	POWERUP_LENGTH = 0.162,
 
 	GAP_LEFT = 0.047, -- (ROOM_WIDTH - (13 * BRICK_WIDTH) ) / 2
 	GAP_TOP = 0.344, -- (ROOM_HEIGHT - (18 * BRICK_HEIGHT) ) / 2
@@ -79,7 +90,7 @@ levels = {}
 balls = {}
 room_colliders = {}
 player = { cooldown_interval = 1, contacted = false, hand = "right", cooldown_timer = timer( false ) }
-cur_level = 17
+cur_level = 1
 world = lovr.physics.newWorld( {
 	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near" },
 	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near" },

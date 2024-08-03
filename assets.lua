@@ -12,7 +12,7 @@ function assets.load()
 	assets[ ASSET_TYPE.SHADER_PBR ] = lovr.graphics.newShader( "devres/shader_PBR.vs", "devres/shader_PBR.fs", { flags = { glow = true, normalMap = true, vertexTangents = false, tonemap = true } } )
 	assets[ ASSET_TYPE.SKYBOX ] = lovr.graphics.newTexture( "devres/galaxy.png" )
 	assets[ ASSET_TYPE.ENVIRONMENT_MAP ] = lovr.graphics.newTexture( 'devres/ibl.ktx' )
-	assets[ ASSET_TYPE.BRICK ] = lovr.graphics.newModel( "devres/brick.glb" )
+	assets[ ASSET_TYPE.BRICK ] = lovr.graphics.newModel( "devres/brick2.glb" )
 	assets[ ASSET_TYPE.BRICK_SILVER ] = lovr.graphics.newModel( "devres/brick_silver.glb" )
 	assets[ ASSET_TYPE.BRICK_GOLD ] = lovr.graphics.newModel( "devres/brick_gold.glb" )
 	assets[ ASSET_TYPE.BALL ] = lovr.graphics.newModel( "devres/ball.glb" )
@@ -30,6 +30,14 @@ function assets.load()
 	assets[ ASSET_TYPE.SND_MOTHERSHIP_INTRO ] = lovr.audio.newSource( "res/sounds/mothership_intro.wav" )
 	assets[ ASSET_TYPE.SND_PADDLE_AWAY ] = lovr.audio.newSource( "res/sounds/paddle_away.wav" )
 	assets[ ASSET_TYPE.SND_PADDLE_TURN_BIG ] = lovr.audio.newSource( "res/sounds/lost_life.wav" )
+
+	assets[ ASSET_TYPE.POWERUP_B ] = lovr.graphics.newModel( "devres/powerup_b.glb" )
+	assets[ ASSET_TYPE.POWERUP_C ] = lovr.graphics.newModel( "devres/powerup_c.glb" )
+	assets[ ASSET_TYPE.POWERUP_D ] = lovr.graphics.newModel( "devres/powerup_d.glb" )
+	assets[ ASSET_TYPE.POWERUP_E ] = lovr.graphics.newModel( "devres/powerup_e.glb" )
+	assets[ ASSET_TYPE.POWERUP_L ] = lovr.graphics.newModel( "devres/powerup_l.glb" )
+	assets[ ASSET_TYPE.POWERUP_P ] = lovr.graphics.newModel( "devres/powerup_p.glb" )
+	assets[ ASSET_TYPE.POWERUP_S ] = lovr.graphics.newModel( "devres/powerup_s.glb" )
 
 	assets[ ASSET_TYPE.SPHERICAL_HARMONICS ] = lovr.graphics.newBuffer( { 'vec3', layout = 'std140' }, {
 		{ 0.611764907836914,  0.599504590034485,  0.479980736970901 },
