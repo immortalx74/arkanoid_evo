@@ -49,6 +49,9 @@ BRICK_COLORS = {
 }
 
 METRICS = {
+	ROOM_WIDTH = 2.2,
+	ROOM_HEIGHT = 2.2,
+	ROOM_DEPTH = 5,
 	WALL_LEFT_X = -1.1,
 	WALL_LEFT_Y = 1.1,
 	WALL_RIGHT_X = 1.1,
@@ -59,9 +62,8 @@ METRICS = {
 gameobjects_list = {}
 game_state = GAME_STATE.INIT
 levels = {}
-bricks = {}
 balls = {}
-room_walls = {}
+room_colliders = {}
 player = { cooldown_interval = 1, contacted = false, hand = "right", cooldown_timer = timer( false ) }
 cur_level = 17
 world = lovr.physics.newWorld( {
@@ -76,4 +78,9 @@ world:disableCollisionBetween( "brick", "brick" )
 world:disableCollisionBetween( "ball", "ball" )
 world:disableCollisionBetween( "brick", "paddle" )
 paused = false
-print( lovr.headset.getRefreshRates() )
+
+-- w:13, h:18
+-- brick volume
+-- brick w:0.162, h:0.084, d:0.084
+-- gap left 0.047
+-- gap top 0.344

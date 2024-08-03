@@ -16,30 +16,6 @@ function util.split( input )
 	return characters
 end
 
-function util.draw_room_colliders( pass )
-	local thickness = 0.5
-	local half_thickness = thickness / 2
-
-	-- pass:box( 1.1 + half_thickness, 1.1, -5, 10, 2.2, thickness, math.pi / 2, 0, 1, 0 )
-
-	-- pass:box( -1.1 - half_thickness, 1.1, -5, 10, 2.2, thickness, math.pi / 2, 0, 1, 0 )
-
-	-- local m = mat4():rotate( math.pi / 2, 0, 1, 0 ):rotate( math.pi / 2, 1, 0, 0 )
-	-- pass:box( 0, 2.2 + half_thickness, -5, 10, 2.2, thickness, quat( m ) )
-
-	-- local m = mat4():rotate( math.pi / 2, 0, 1, 0 ):rotate( math.pi / 2, 1, 0, 0 )
-	-- pass:box( 0, -half_thickness, -5, 10, 2.2, thickness, quat( m ) )
-
-	-- pass:box( 0, 1.1, half_thickness, 2.2, 2.2, thickness )
-
-	-- pass:box( 0, 1.1, -10 - half_thickness, 2.2, 2.2, thickness )
-
-	local x, y, z, angle, ax, ay, az = obj_paddle.collider:getShapes()[ 1 ]:getPose()
-	local radius = obj_paddle.collider:getShapes()[ 1 ]:getRadius()
-	local length = obj_paddle.collider:getShapes()[ 1 ]:getLength()
-	-- pass:cylinder( x, y, z, radius, length, angle, ax, ay, az )
-end
-
 function util.reflection_vector( face_normal, direction )
 	local n = face_normal
 	local d = direction:dot( n )
@@ -117,9 +93,8 @@ function util.brick_collision( cur_ball )
 			local v = vec3( cur_ball.pose )
 			cur_ball.pose:set( vec3( v.x - nx, v.y - ny, v.z - nz ) )
 			cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
-			paused = true
-			os.execute( "cls" )
-			print(str)
+			-- os.execute( "cls" )
+			-- print(str)
 		end
 	end
 end
@@ -174,14 +149,26 @@ function util.paddle_collision( cur_ball )
 
 		if collider then
 			if collider:getTag() == "paddle" then
+				local m = mat4( obj_paddle.pose ):rotate( math.pi / 2, 1, 0, 0 )
+				local v = quat( m ):direction()
+
 				local dir = quat( obj_paddle.pose ):direction()
-				cur_ball.direction:set( util.reflection_vector( dir, -cur_ball.direction ) )
+				cur_ball.direction:set( util.reflection_vector( vec3( v ), cur_ball.direction ) )
+
+				-- NOTE: crude resolution
+				local v = vec3( cur_ball.pose )
+				cur_ball.pose:set( vec3( v.x - nx, v.y - ny, v.z - nz - 0.05 ) )
+				cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
+
 				player.contacted = true
 				assets[ ASSET_TYPE.SND_BALL_TO_PADDLE ]:stop()
 				assets[ ASSET_TYPE.SND_BALL_TO_PADDLE ]:play()
+				return true
 			end
 		end
 	end
+
+	return false
 end
 
 function util.setup_room_colliders( collider )
@@ -213,35 +200,19 @@ function util.setup_room_colliders( collider )
 	local front = world:newBoxCollider( 0, 1.1, 0 + half_thickness, 2.2, 2.2, thickness )
 	front:setTag( "wall_front" )
 
-	table.insert( room_walls, right )
-	table.insert( room_walls, left )
-	table.insert( room_walls, top )
-	table.insert( room_walls, bottom )
-	table.insert( room_walls, back )
-	table.insert( room_walls, front )
+	table.insert( room_colliders, right )
+	table.insert( room_colliders, left )
+	table.insert( room_colliders, top )
+	table.insert( room_colliders, bottom )
+	table.insert( room_colliders, back )
+	table.insert( room_colliders, front )
 end
 
 function util.generate_level()
 	-- NOTE: Cleanup state here
-	bricks = {}
 	balls = {}
 	local ball = gameobject( vec3( -0.8, 1.6, -1 ), ASSET_TYPE.BALL )
 	table.insert( balls, ball )
-
-	-- local ball = gameobject( vec3( 0.3, 1, -0.2 ), ASSET_TYPE.BALL )
-	-- table.insert( balls, ball )
-
-	-- local ball = gameobject( vec3( 0.8, 1.8, -2 ), ASSET_TYPE.BALL )
-	-- table.insert( balls, ball )
-
-	-- local ball = gameobject( vec3( 0.6, 0.8, -1 ), ASSET_TYPE.BALL )
-	-- table.insert( balls, ball )
-
-	-- w:13, h:18
-	-- brick volume
-	-- brick w:0.162, h:0.084, d:0.084
-	-- gap left 0.047
-	-- gap top 0.344
 
 	local left = -(2.2 / 2) + 0.047 + (0.162 / 2)
 	local top = 2.2 - 0.344 + (0.084 / 2)
@@ -255,8 +226,6 @@ function util.generate_level()
 			else
 				gameobject( vec3( left, top, -3 ), ASSET_TYPE.BRICK, false, BRICK_COLORS[ v ] )
 			end
-
-			-- table.insert( bricks, { position = vec3( left, top, -3 ), color = BRICK_COLORS[ v ] } )
 		end
 
 		left = left + 0.162

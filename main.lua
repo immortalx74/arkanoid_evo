@@ -2,6 +2,10 @@ require "globals"
 local gameobject = require "gameobject"
 local assets = require "assets"
 local util = require "util"
+local phywire = require "phywire"
+
+phywire.options.wireframe = true
+phywire.options.overdraw = false
 
 function lovr.load()
 	assets.load()
@@ -11,7 +15,6 @@ function lovr.load()
 	obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER )
 	obj_room = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM )
 	obj_room_glass = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM_GLASS, true )
-	-- obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
 	game_state = GAME_STATE.GENERATE_LEVEL
 end
 
@@ -40,6 +43,6 @@ function lovr.draw( pass )
 
 	if game_state == GAME_STATE.PLAY then
 		gameobject.draw_all( pass )
-		util.draw_room_colliders( pass )
+		phywire.draw( pass, world )
 	end
 end
