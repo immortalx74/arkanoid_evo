@@ -89,11 +89,12 @@ game_state = GAME_STATE.INIT
 levels = {}
 balls = {}
 room_colliders = {}
-player = { cooldown_interval = 1, contacted = false, hand = "right", cooldown_timer = timer( false ) }
-cur_level = 1
+player = { cooldown_interval = 1, contacted = false, hand = "right", cooldown_timer = timer( false ), powerup = nil }
+cur_level = 17
+powerup_timer = timer( false )
 world = lovr.physics.newWorld( {
-	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near" },
-	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near" },
+	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup" },
+	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup" },
 	maxColliders = 512,
 	threadSafe = false,
 	tickRate = 60,
@@ -102,7 +103,10 @@ world = lovr.physics.newWorld( {
 world:disableCollisionBetween( "brick", "brick" )
 world:disableCollisionBetween( "ball", "ball" )
 world:disableCollisionBetween( "brick", "paddle" )
+world:disableCollisionBetween( "brick", "powerup" )
+world:disableCollisionBetween( "ball", "powerup" )
 paused = false
 
 phywire.options.wireframe = true
 phywire.options.overdraw = true
+math.randomseed( os.time() )

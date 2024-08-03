@@ -62,6 +62,14 @@ function util.brick_collision( cur_ball )
 			if o.type == ASSET_TYPE.BRICK or o.type == ASSET_TYPE.BRICK_SILVER then
 				o.strength = o.strength - 1
 				if o.strength == 0 then
+					-- Spawn powerup
+					if powerup_timer:get_elapsed() > 3 then
+						local random_powerup = math.random( ASSET_TYPE.POWERUP_B, ASSET_TYPE.POWERUP_S )
+						local v = mat4( o.pose ):translate( 0, 0, (METRICS.BRICK_DEPTH / 2) - METRICS.POWERUP_RADIUS )
+						gameobject( vec3( v ), random_powerup )
+						powerup_timer:start()
+					end
+
 					o:destroy()
 					assets[ ASSET_TYPE.SND_BALL_BRICK_DESTROY ]:stop()
 					assets[ ASSET_TYPE.SND_BALL_BRICK_DESTROY ]:play()
@@ -108,6 +116,17 @@ function util.wall_collision( cur_ball )
 			cur_ball.direction:set( util.reflection_vector( n, cur_ball.direction ) )
 		end
 	end
+end
+
+function util.powerup_collision( cur_powerup )
+	local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( cur_powerup.collider:getShapes()[ 1 ], vec3( cur_powerup.pose ), quat( cur_powerup.pose ), "paddle" )
+	if collider then
+		if collider:getTag() == "paddle" then
+			return true
+		end
+	end
+
+	return false
 end
 
 function util.paddle_collision( cur_ball )
@@ -209,6 +228,7 @@ function util.generate_level()
 
 	obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
 	player.cooldown_timer:start()
+	powerup_timer:start()
 end
 
 return util

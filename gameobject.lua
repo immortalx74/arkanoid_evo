@@ -51,6 +51,8 @@ function gameobject:new( pose, type, transparent, color )
 	elseif type >= ASSET_TYPE.POWERUP_B and type <= ASSET_TYPE.POWERUP_S then
 		obj.collider = world:newCylinderCollider( lovr.math.newVec3( obj.pose ), METRICS.POWERUP_RADIUS, METRICS.POWERUP_LENGTH )
 		obj.collider:setOrientation( math.pi / 2, 0, 1, 0 )
+		obj.collider:setTag( "powerup" )
+		obj.collider:setUserData( obj )
 	end
 
 	table.insert( gameobjects_list, obj )
@@ -98,7 +100,19 @@ function gameobject:update( dt )
 			end
 		end
 	elseif self.type >= ASSET_TYPE.POWERUP_B and self.type <= ASSET_TYPE.POWERUP_S then
-		self.collider:setPosition( vec3( self.pose ) )
+		if vec3( self.pose ).z < 0 then
+			local hit = util.powerup_collision( self )
+			if hit then
+				local o = self.collider:getUserData()
+				o:destroy()
+			else
+				self.pose:translate( 0, 0, 0.8 * dt )
+				self.collider:setPosition( vec3( self.pose ) )
+			end
+		else
+			local o = self.collider:getUserData()
+			o:destroy()
+		end
 	end
 end
 
