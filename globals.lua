@@ -1,4 +1,5 @@
 local timer = require "timer"
+phywire = require "phywire"
 
 ASSET_TYPE = {
 	PADDLE = 1,
@@ -51,12 +52,25 @@ BRICK_COLORS = {
 METRICS = {
 	ROOM_WIDTH = 2.2,
 	ROOM_HEIGHT = 2.2,
-	ROOM_DEPTH = 5,
-	WALL_LEFT_X = -1.1,
-	WALL_LEFT_Y = 1.1,
-	WALL_RIGHT_X = 1.1,
-	WALL_RIGHT_Y = 1.1,
-	CEILING_Y = 2.2,
+	ROOM_DEPTH = 3.5,
+
+	BRICK_WIDTH = 0.162,
+	BRICK_HEIGHT = 0.084,
+	BRICK_DEPTH = 0.084,
+	BRICK_DIST_Z = 3,
+
+	GAP_LEFT = 0.047, -- (ROOM_WIDTH - (13 * BRICK_WIDTH) ) / 2
+	GAP_TOP = 0.344, -- (ROOM_HEIGHT - (18 * BRICK_HEIGHT) ) / 2
+
+	NUM_BRICK_COLS = 13,
+	NUM_BRICK_ROWS = 18,
+
+	WALL_THICKNESS = 0.5,
+
+	BALL_RADIUS = 0.03,
+	PADDLE_RADIUS = 0.14,
+	PADDLE_COLLIDER_THICKNESS = 0.04,
+	SUBSTEPS = 10
 }
 
 gameobjects_list = {}
@@ -67,11 +81,11 @@ room_colliders = {}
 player = { cooldown_interval = 1, contacted = false, hand = "right", cooldown_timer = timer( false ) }
 cur_level = 17
 world = lovr.physics.newWorld( {
-	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_back", "wall_front" },
-	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_back", "wall_front" },
+	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near" },
+	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near" },
 	maxColliders = 512,
 	threadSafe = false,
-	tickRate = 480,
+	tickRate = 60,
 	maxPenetration = 0.02
 } )
 world:disableCollisionBetween( "brick", "brick" )
@@ -79,8 +93,5 @@ world:disableCollisionBetween( "ball", "ball" )
 world:disableCollisionBetween( "brick", "paddle" )
 paused = false
 
--- w:13, h:18
--- brick volume
--- brick w:0.162, h:0.084, d:0.084
--- gap left 0.047
--- gap top 0.344
+phywire.options.wireframe = true
+phywire.options.overdraw = true

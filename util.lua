@@ -23,18 +23,7 @@ function util.reflection_vector( face_normal, direction )
 end
 
 function util.get_hit_face( nx, ny, nz )
-	-- NOTE: test getting correct hit side (snippet credit: j_miskov)
-	-- Seems reversing left/right and up/down, but NOT forward-back gives the correct result?
-
-	-- local direcions = {
-	-- 	{ 'top',      vec3.up },
-	-- 	{ 'bottom',    vec3.down },
-	-- 	{ 'left',    vec3.left },
-	-- 	{ 'right',   vec3.right },
-	-- 	{ 'front', vec3.forward },
-	-- 	{ 'back',    vec3.back }
-	-- }
-
+	-- snippet credit: j_miskov, https://github.com/jmiskovic
 	local direcions = {
 		{ 'top',    vec3.down },
 		{ 'bottom', vec3.up },
@@ -67,10 +56,6 @@ function util.brick_collision( cur_ball )
 			local t = util.get_hit_face( nx, ny, nz )
 			local str = t[ 1 ]
 			local face_normal = t[ 2 ]
-			if t then
-				-- os.execute( "cls" )
-				-- print( str, face_normal )
-			end
 
 			cur_ball.direction:set( util.reflection_vector( face_normal, cur_ball.direction ) )
 
@@ -93,8 +78,6 @@ function util.brick_collision( cur_ball )
 			local v = vec3( cur_ball.pose )
 			cur_ball.pose:set( vec3( v.x - nx, v.y - ny, v.z - nz ) )
 			cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
-			-- os.execute( "cls" )
-			-- print(str)
 		end
 	end
 end
@@ -103,36 +86,25 @@ function util.wall_collision( cur_ball )
 	local room = cur_ball.collider:getShapes()
 
 	for i, wall in ipairs( room ) do
-		local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( wall, vec3( cur_ball.pose ), quat( cur_ball.pose ), "wall_left wall_right wall_top wall_bottom wall_back wall_front" )
+		local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( wall, vec3( cur_ball.pose ), quat( cur_ball.pose ), "wall_left wall_right wall_top wall_bottom wall_far wall_near" )
 		if collider then
 			local n = vec3()
 			local cur_ball_pos = vec3( cur_ball.pose )
 			if collider:getTag() == "wall_right" then
-				cur_ball.pose:set( vec3( 1.1 - 0.1, cur_ball_pos.y, cur_ball_pos.z ) )
-				cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
 				n:set( -1, 0, 0 )
 			elseif collider:getTag() == "wall_left" then
-				cur_ball.pose:set( vec3( -1.1 + 0.1, cur_ball_pos.y, cur_ball_pos.z ) )
-				cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
 				n:set( 1, 0, 0 )
 			elseif collider:getTag() == "wall_top" then
-				cur_ball.pose:set( vec3( cur_ball_pos.x, 2.2 - 0.1, cur_ball_pos.z ) )
-				cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
 				n:set( 0, -1, 0 )
 			elseif collider:getTag() == "wall_bottom" then
-				cur_ball.pose:set( vec3( cur_ball_pos.x, 0.1, cur_ball_pos.z ) )
-				cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
 				n:set( 0, 1, 0 )
-			elseif collider:getTag() == "wall_back" then
-				-- cur_ball.pose:set( vec3( cur_ball_pos.x, cur_ball_pos.y, -0.2 ) )
+			elseif collider:getTag() == "wall_far" then
 				n:set( 0, 0, -1 )
-			elseif collider:getTag() == "wall_front" then
-				-- cur_ball.pose:set( vec3( cur_ball_pos.x, cur_ball_pos.y, -4 + 0.2 ) )
+			elseif collider:getTag() == "wall_near" then
 				n:set( 0, 0, 1 )
-			else
-				print( "no tag" )
 			end
 
+			cur_ball.pose:translate( -nx, -ny, -nz )
 			cur_ball.direction:set( util.reflection_vector( n, cur_ball.direction ) )
 		end
 	end
@@ -155,7 +127,7 @@ function util.paddle_collision( cur_ball )
 				local dir = quat( obj_paddle.pose ):direction()
 				cur_ball.direction:set( util.reflection_vector( vec3( v ), cur_ball.direction ) )
 
-				-- NOTE: crude resolution
+				-- Place ball slightly in front to prevent collision on subsequent frames
 				local v = vec3( cur_ball.pose )
 				cur_ball.pose:set( vec3( v.x - nx, v.y - ny, v.z - nz - 0.05 ) )
 				cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
@@ -173,32 +145,32 @@ end
 
 function util.setup_room_colliders( collider )
 	local thickness = 0.5
-	local half_thickness = thickness / 2
+	local half_thickness = METRICS.WALL_THICKNESS / 2
 
-	local right = world:newBoxCollider( 1.1 + half_thickness, 1.1, -5, 10, 2.2, thickness )
+	local right = world:newBoxCollider( (METRICS.ROOM_WIDTH / 2) + half_thickness, (METRICS.ROOM_HEIGHT / 2), -METRICS.ROOM_DEPTH / 2, METRICS.ROOM_DEPTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
 	right:setOrientation( math.pi / 2, 0, 1, 0 )
 	right:setTag( "wall_right" )
 
-	local left = world:newBoxCollider( -1.1 - half_thickness, 1.1, -5, 10, 2.2, thickness )
+	local left = world:newBoxCollider( -(METRICS.ROOM_WIDTH / 2) - half_thickness, (METRICS.ROOM_HEIGHT / 2), -METRICS.ROOM_DEPTH / 2, METRICS.ROOM_DEPTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
 	left:setOrientation( -math.pi / 2, 0, 1, 0 )
 	left:setTag( "wall_left" )
 
-	local top = world:newBoxCollider( 0, 2.2 + half_thickness, -5, 10, 2.2, thickness )
+	local top = world:newBoxCollider( 0, METRICS.ROOM_HEIGHT + half_thickness, -METRICS.ROOM_DEPTH / 2, METRICS.ROOM_DEPTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
 	local m = mat4():rotate( math.pi / 2, 0, 1, 0 ):rotate( math.pi / 2, 1, 0, 0 )
 	top:setOrientation( quat( m ) )
 	top:setTag( "wall_top" )
 
-	local bottom = world:newBoxCollider( 0, 0 - half_thickness, -5, 10, 2.2, thickness )
+	local bottom = world:newBoxCollider( 0, -half_thickness, -METRICS.ROOM_DEPTH / 2, METRICS.ROOM_DEPTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
 	local m = mat4():rotate( math.pi / 2, 0, 1, 0 ):rotate( -math.pi / 2, 1, 0, 0 )
 	bottom:setOrientation( quat( m ) )
 	bottom:setTag( "wall_bottom" )
 
 	-- NOTE: Moved closer for testing
-	local back = world:newBoxCollider( 0, 1.1, -3.5 - half_thickness, 2.2, 2.2, thickness )
-	back:setTag( "wall_back" )
+	local back = world:newBoxCollider( 0, (METRICS.ROOM_HEIGHT / 2), -METRICS.ROOM_DEPTH - half_thickness, METRICS.ROOM_WIDTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
+	back:setTag( "wall_far" )
 
-	local front = world:newBoxCollider( 0, 1.1, 0 + half_thickness, 2.2, 2.2, thickness )
-	front:setTag( "wall_front" )
+	local front = world:newBoxCollider( 0, (METRICS.ROOM_HEIGHT / 2), half_thickness, METRICS.ROOM_WIDTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
+	front:setTag( "wall_near" )
 
 	table.insert( room_colliders, right )
 	table.insert( room_colliders, left )
@@ -214,24 +186,24 @@ function util.generate_level()
 	local ball = gameobject( vec3( -0.8, 1.6, -1 ), ASSET_TYPE.BALL )
 	table.insert( balls, ball )
 
-	local left = -(2.2 / 2) + 0.047 + (0.162 / 2)
-	local top = 2.2 - 0.344 + (0.084 / 2)
+	local left = -(METRICS.ROOM_WIDTH / 2) + METRICS.GAP_LEFT + (METRICS.BRICK_WIDTH / 2)
+	local top = METRICS.ROOM_HEIGHT - METRICS.GAP_TOP + (METRICS.BRICK_HEIGHT / 2)
 
 	for i, v in ipairs( levels[ cur_level ] ) do
 		if v ~= "0" then
 			if v == "s" then
-				gameobject( vec3( left, top, -3 ), ASSET_TYPE.BRICK_SILVER )
+				gameobject( vec3( left, top, -METRICS.BRICK_DIST_Z ), ASSET_TYPE.BRICK_SILVER )
 			elseif v == "$" then
-				gameobject( vec3( left, top, -3 ), ASSET_TYPE.BRICK_GOLD )
+				gameobject( vec3( left, top, -METRICS.BRICK_DIST_Z ), ASSET_TYPE.BRICK_GOLD )
 			else
-				gameobject( vec3( left, top, -3 ), ASSET_TYPE.BRICK, false, BRICK_COLORS[ v ] )
+				gameobject( vec3( left, top, -METRICS.BRICK_DIST_Z ), ASSET_TYPE.BRICK, false, BRICK_COLORS[ v ] )
 			end
 		end
 
-		left = left + 0.162
-		if i % 13 == 0 then
-			top = top - 0.084
-			left = -(2.2 / 2) + 0.047 + (0.162 / 2)
+		left = left + METRICS.BRICK_WIDTH
+		if i % METRICS.NUM_BRICK_COLS == 0 then
+			top = top - METRICS.BRICK_HEIGHT
+			left = -(METRICS.ROOM_WIDTH / 2) + METRICS.GAP_LEFT + (METRICS.BRICK_WIDTH / 2)
 		end
 	end
 

@@ -2,10 +2,6 @@ require "globals"
 local gameobject = require "gameobject"
 local assets = require "assets"
 local util = require "util"
-local phywire = require "phywire"
-
-phywire.options.wireframe = true
-phywire.options.overdraw = false
 
 function lovr.load()
 	assets.load()

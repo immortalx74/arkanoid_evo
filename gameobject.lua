@@ -16,14 +16,14 @@ function gameobject:new( pose, type, transparent, color )
 	obj.transparent = transparent or false
 	obj.color = color or false
 	if type == ASSET_TYPE.BALL then
-		obj.velocity = 0.04
+		obj.velocity = 2 / METRICS.SUBSTEPS
 		obj.direction = lovr.math.newVec3( 0.5, -0.2, -1 )
-		obj.collider = world:newSphereCollider( lovr.math.newVec3( obj.pose ), 0.03 )
+		obj.collider = world:newSphereCollider( lovr.math.newVec3( obj.pose ), METRICS.BALL_RADIUS )
 		obj.collider:setTag( "ball" )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
 	elseif type == ASSET_TYPE.BRICK or type == ASSET_TYPE.BRICK_GOLD or type == ASSET_TYPE.BRICK_SILVER then
-		obj.collider = world:newBoxCollider( lovr.math.newVec3( obj.pose ), vec3( 0.162, 0.084, 0.084 ) )
+		obj.collider = world:newBoxCollider( lovr.math.newVec3( obj.pose ), vec3( METRICS.BRICK_WIDTH, METRICS.BRICK_HEIGHT, METRICS.BRICK_DEPTH ) )
 		obj.collider:setTag( "brick" )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
@@ -41,9 +41,8 @@ function gameobject:new( pose, type, transparent, color )
 			v:setSensor( true )
 		end
 	elseif type == ASSET_TYPE.PADDLE then
-		local length = 0.04
-		local half_length = length / 2
-		obj.collider = world:newCylinderCollider( 0, 0, 0, 0.14, length )
+		local length = METRICS.PADDLE_COLLIDER_THICKNESS
+		obj.collider = world:newCylinderCollider( 0, 0, 0, METRICS.PADDLE_RADIUS, length )
 		obj.collider:getShapes()[ 1 ]:setOffset( 0, length / 2, 0, math.pi / 2, 1, 0, 0 )
 		obj.collider:setTag( "paddle" )
 		obj.collider:setUserData( obj )
@@ -63,14 +62,14 @@ function gameobject:update( dt )
 	end
 
 	if self.type == ASSET_TYPE.BALL then
-		for i = 1, 66 do
+		for i = 1, METRICS.SUBSTEPS do
 			-- paddle substep first (src, dst, stp = source, destination, current-step)
 			local x, y, z, angle, ax, ay, az = lovr.headset.getPose( player.hand )
 			local v_src = vec3( obj_paddle.pose )
 			local q_src = quat( obj_paddle.pose )
 			local v_dst = vec3( x, y, z )
 			local q_dst = quat( angle, ax, ay, az )
-			local n = (i - 1) / (66 - 1) -- normalized
+			local n = (i - 1) / (METRICS.SUBSTEPS - 1) -- normalized
 			local v_stp = v_src:lerp( v_dst, n )
 			local q_stp = q_src:slerp( q_dst, n )
 
