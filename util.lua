@@ -63,11 +63,16 @@ function util.brick_collision( cur_ball )
 				o.strength = o.strength - 1
 				if o.strength == 0 then
 					-- Spawn powerup
-					if powerup_timer:get_elapsed() > 3 then
-						local random_powerup = math.random( ASSET_TYPE.POWERUP_B, ASSET_TYPE.POWERUP_S )
+					if powerup.timer:get_elapsed() > powerup.interval then
+						local random_powerup = nil
+						while true do
+							random_powerup = math.random( ASSET_TYPE.POWERUP_B, ASSET_TYPE.POWERUP_S )
+							if random_powerup ~= powerup.falling and random_powerup ~= powerup.owned then break end
+						end
 						local v = mat4( o.pose ):translate( 0, 0, (METRICS.BRICK_DEPTH / 2) - METRICS.POWERUP_RADIUS )
 						gameobject( vec3( v ), random_powerup )
-						powerup_timer:start()
+						powerup.timer:start()
+						powerup.falling = random_powerup
 					end
 
 					o:destroy()
@@ -131,9 +136,9 @@ end
 
 function util.paddle_collision( cur_ball )
 	if player.contacted then
-		if player.cooldown_timer:get_elapsed() >= player.cooldown_interval then
+		if player.paddle_cooldown_timer:get_elapsed() >= player.cooldown_interval then
 			player.contacted = false
-			player.cooldown_timer:start()
+			player.paddle_cooldown_timer:start()
 		end
 	else
 		local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( cur_ball.collider:getShapes()[ 1 ], vec3( cur_ball.pose ), quat( cur_ball.pose ), "paddle" )
@@ -226,9 +231,13 @@ function util.generate_level()
 		end
 	end
 
+	obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE )
+	obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER )
+	obj_room = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM )
+	obj_room_glass = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM_GLASS, true )
 	obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
-	player.cooldown_timer:start()
-	powerup_timer:start()
+	player.paddle_cooldown_timer:start()
+	powerup.timer:start()
 end
 
 return util

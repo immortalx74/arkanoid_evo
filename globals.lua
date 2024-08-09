@@ -36,6 +36,10 @@ ASSET_TYPE = {
 	POWERUP_L = 32,
 	POWERUP_P = 33,
 	POWERUP_S = 34,
+	PADDLE_BIG = 35,
+	PADDLE_TOP_BIG = 36,
+	PADDLE_SPINNER_BIG = 37,
+	PADDLE_LASER = 38
 }
 
 GAME_STATE = {
@@ -80,8 +84,10 @@ METRICS = {
 
 	BALL_RADIUS = 0.03,
 	PADDLE_RADIUS = 0.14,
+	PADDLE_BIG_RADIUS = 0.2,
 	PADDLE_COLLIDER_THICKNESS = 0.04,
-	SUBSTEPS = 10
+	SUBSTEPS = 10,
+	POWERUP_SPAWN_INTERVAL = 3
 }
 
 gameobjects_list = {}
@@ -89,9 +95,9 @@ game_state = GAME_STATE.INIT
 levels = {}
 balls = {}
 room_colliders = {}
-player = { cooldown_interval = 1, contacted = false, hand = "right", cooldown_timer = timer( false ), powerup = nil }
+player = { cooldown_interval = 1, contacted = false, hand = "right", paddle_cooldown_timer = timer( false ), powerup = nil }
 cur_level = 17
-powerup_timer = timer( false )
+powerup = { timer = timer( false ), falling = nil, owned = nil, interval = 3 }
 world = lovr.physics.newWorld( {
 	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup" },
 	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup" },

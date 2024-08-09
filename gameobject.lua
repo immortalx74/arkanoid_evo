@@ -48,6 +48,20 @@ function gameobject:new( pose, type, transparent, color )
 		obj.collider:setTag( "paddle" )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
+	elseif type == ASSET_TYPE.PADDLE_BIG then
+		local length = METRICS.PADDLE_COLLIDER_THICKNESS
+		obj.collider = world:newCylinderCollider( 0, 0, 0, METRICS.PADDLE_BIG_RADIUS, length )
+		obj.collider:getShapes()[ 1 ]:setOffset( 0, length / 2, 0, math.pi / 2, 1, 0, 0 )
+		obj.collider:setTag( "paddle" )
+		obj.collider:setUserData( obj )
+		obj.collider:setSensor( true )
+	elseif type == ASSET_TYPE.PADDLE_LASER then
+		local length = METRICS.PADDLE_COLLIDER_THICKNESS
+		obj.collider = world:newCylinderCollider( 0, 0, 0, METRICS.PADDLE_RADIUS, length )
+		obj.collider:getShapes()[ 1 ]:setOffset( 0, length / 2, 0, math.pi / 2, 1, 0, 0 )
+		obj.collider:setTag( "paddle" )
+		obj.collider:setUserData( obj )
+		obj.collider:setSensor( true )
 	elseif type >= ASSET_TYPE.POWERUP_B and type <= ASSET_TYPE.POWERUP_S then
 		obj.collider = world:newCylinderCollider( lovr.math.newVec3( obj.pose ), METRICS.POWERUP_RADIUS, METRICS.POWERUP_LENGTH )
 		obj.collider:setOrientation( math.pi / 2, 0, 1, 0 )
@@ -56,7 +70,9 @@ function gameobject:new( pose, type, transparent, color )
 	end
 
 	table.insert( gameobjects_list, obj )
-
+	table.sort( gameobjects_list, function( a, b ) -- sort by transparency...
+		return b.transparent and not a.transparent
+	end )
 	return obj
 end
 
@@ -104,12 +120,30 @@ function gameobject:update( dt )
 			local hit = util.powerup_collision( self )
 			if hit then
 				local o = self.collider:getUserData()
+				powerup.owned = o.type
+				if powerup.owned == ASSET_TYPE.POWERUP_E then
+					obj_paddle:destroy()
+					obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_BIG )
+					obj_paddle_top:destroy()
+					obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP_BIG, true )
+					obj_paddle_spinner:destroy()
+					obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER_BIG )
+				elseif powerup.owned == ASSET_TYPE.POWERUP_L then
+					obj_paddle:destroy()
+					obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_LASER )
+					obj_paddle_top:destroy()
+					obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
+					obj_paddle_spinner:destroy()
+					obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER )
+					-- NOTE: add case to turn to normal again
+				end
 				o:destroy()
 			else
 				self.pose:translate( 0, 0, 0.8 * dt )
 				self.collider:setPosition( vec3( self.pose ) )
 			end
 		else
+			powerup.falling = nil
 			local o = self.collider:getUserData()
 			o:destroy()
 		end
@@ -131,6 +165,11 @@ function gameobject:draw( pass )
 		self.model:animate( 1, lovr.timer.getTime() )
 	elseif self.type >= ASSET_TYPE.POWERUP_B and self.type <= ASSET_TYPE.POWERUP_S then
 		self.model:animate( 1, lovr.timer.getTime() )
+	elseif self.type == ASSET_TYPE.PADDLE or self.type == ASSET_TYPE.PADDLE_BIG or self.type == ASSET_TYPE.PADDLE_LASER then
+		local count = self.model:getAnimationCount()
+		for i = 1, count do
+			self.model:animate( i, lovr.timer.getTime() )
+		end
 	end
 
 	pass:draw( self.model, self.pose )
