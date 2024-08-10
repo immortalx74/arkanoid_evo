@@ -4,6 +4,7 @@ package.loaded[ ... ] = util
 
 local gameobject = require "gameobject"
 local assets = require "assets"
+local powerup = require "powerup"
 
 function util.split( input )
 	local stripped = input:gsub( "[\r\n,]", "" ) -- Remove newlines and commas
@@ -62,19 +63,7 @@ function util.brick_collision( cur_ball )
 			if o.type == ASSET_TYPE.BRICK or o.type == ASSET_TYPE.BRICK_SILVER then
 				o.strength = o.strength - 1
 				if o.strength == 0 then
-					-- Spawn powerup
-					if powerup.timer:get_elapsed() > powerup.interval then
-						local random_powerup = nil
-						while true do
-							random_powerup = math.random( ASSET_TYPE.POWERUP_B, ASSET_TYPE.POWERUP_S )
-							if random_powerup ~= powerup.falling and random_powerup ~= powerup.owned then break end
-						end
-						local v = mat4( o.pose ):translate( 0, 0, (METRICS.BRICK_DEPTH / 2) - METRICS.POWERUP_RADIUS )
-						gameobject( vec3( v ), random_powerup )
-						powerup.timer:start()
-						powerup.falling = random_powerup
-					end
-
+					powerup.spawn( o.pose )
 					o:destroy()
 					assets[ ASSET_TYPE.SND_BALL_BRICK_DESTROY ]:stop()
 					assets[ ASSET_TYPE.SND_BALL_BRICK_DESTROY ]:play()
@@ -136,7 +125,7 @@ end
 
 function util.paddle_collision( cur_ball )
 	if player.contacted then
-		if player.paddle_cooldown_timer:get_elapsed() >= player.cooldown_interval then
+		if player.paddle_cooldown_timer:get_elapsed() >= METRICS.PADDLE_COOLDOWN_INTERVAL then
 			player.contacted = false
 			player.paddle_cooldown_timer:start()
 		end
@@ -204,8 +193,27 @@ function util.setup_room_colliders( collider )
 	table.insert( room_colliders, front )
 end
 
+function util.spawn_paddle( paddle_type )
+	if obj_paddle then obj_paddle:destroy() end
+	if obj_paddle_top then obj_paddle_top:destroy() end
+	if obj_paddle_spinner then obj_paddle_spinner:destroy() end
+
+	if paddle_type == ASSET_TYPE.PADDLE then
+		obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE )
+		obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
+		obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER )
+	elseif paddle_type == ASSET_TYPE.PADDLE_BIG then
+		obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_BIG )
+		obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP_BIG, true )
+		obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER_BIG )
+	else
+		obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_LASER )
+		obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
+		obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER )
+	end
+end
+
 function util.generate_level()
-	-- NOTE: Cleanup state here
 	balls = {}
 	local ball = gameobject( vec3( -0.8, 1.6, -1 ), ASSET_TYPE.BALL )
 	table.insert( balls, ball )
@@ -231,12 +239,14 @@ function util.generate_level()
 		end
 	end
 
-	obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE )
-	obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER )
+	util.spawn_paddle( ASSET_TYPE.PADDLE )
 	obj_room = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM )
 	obj_room_glass = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM_GLASS, true )
-	obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
+
+	gameobject( vec3( 0, 1, -1 ), ASSET_TYPE.PROJECTILE )
+
 	player.paddle_cooldown_timer:start()
+	player.laser_cooldown_timer:start()
 	powerup.timer:start()
 end
 

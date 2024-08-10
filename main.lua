@@ -2,6 +2,8 @@ require "globals"
 local gameobject = require "gameobject"
 local assets = require "assets"
 local util = require "util"
+local powerup = require "powerup"
+local timer = require "timer"
 
 function lovr.load()
 	assets.load()
@@ -20,6 +22,15 @@ function lovr.update( dt )
 		util.generate_level()
 		game_state = GAME_STATE.PLAY
 	elseif game_state == GAME_STATE.PLAY then
+		if powerup.owned == ASSET_TYPE.POWERUP_L then
+			if lovr.headset.wasPressed( player.hand, "trigger" ) then
+				if player.laser_cooldown_timer:get_elapsed() >= METRICS.LASER_COOLDOWN_INTERVAL then
+					local x, y, z, angle, ax, ay, az = lovr.headset.getPose( player.hand )
+					gameobject( mat4( vec3( x, y, z ), quat( angle, ax, ay, az ) ), ASSET_TYPE.PROJECTILE )
+					player.laser_cooldown_timer:start()
+				end
+			end
+		end
 		gameobject.update_all( dt )
 	end
 end

@@ -1,4 +1,18 @@
+-- TODO:
+-- silver bricks shouldn't spawn powerups
+-- When exit gate is open you CAN collect any other powerup
+-- max lives = 6
+-- collecting "life" powerup turns paddle to normal
+-- silver bricks start with strength = 2, increasing by 1 every 8 stages
+-- set playfield origin slightly forward (also let powerups travel a bit further on negative Z axis)
+-- "owned" powerup shouldn't change when catching life powerup
+
+package.loaded[ ... ] = "globals"
+
+
 local timer = require "timer"
+local util = require "util"
+local assets = require "assets"
 phywire = require "phywire"
 
 ASSET_TYPE = {
@@ -39,7 +53,8 @@ ASSET_TYPE = {
 	PADDLE_BIG = 35,
 	PADDLE_TOP_BIG = 36,
 	PADDLE_SPINNER_BIG = 37,
-	PADDLE_LASER = 38
+	PADDLE_LASER = 38,
+	PROJECTILE = 39
 }
 
 GAME_STATE = {
@@ -73,6 +88,7 @@ METRICS = {
 
 	POWERUP_RADIUS = 0.042,
 	POWERUP_LENGTH = 0.162,
+	POWERUP_SPEED = 0.8,
 
 	GAP_LEFT = 0.047, -- (ROOM_WIDTH - (13 * BRICK_WIDTH) ) / 2
 	GAP_TOP = 0.344, -- (ROOM_HEIGHT - (18 * BRICK_HEIGHT) ) / 2
@@ -87,7 +103,15 @@ METRICS = {
 	PADDLE_BIG_RADIUS = 0.2,
 	PADDLE_COLLIDER_THICKNESS = 0.04,
 	SUBSTEPS = 10,
-	POWERUP_SPAWN_INTERVAL = 3
+	POWERUP_SPAWN_INTERVAL = 3,
+
+	PROJECTILE_LENGTH = 0.05,
+	PROJECTILE_RADIUS = 0.01,
+	PROJECTILE_X_OFFSET = 0.09,
+	PROJECTILE_SPEED = 0.8,
+
+	PADDLE_COOLDOWN_INTERVAL = 1,
+	LASER_COOLDOWN_INTERVAL = 0.5
 }
 
 gameobjects_list = {}
@@ -95,12 +119,12 @@ game_state = GAME_STATE.INIT
 levels = {}
 balls = {}
 room_colliders = {}
-player = { cooldown_interval = 1, contacted = false, hand = "right", paddle_cooldown_timer = timer( false ), powerup = nil }
+player = { contacted = false, hand = "left", paddle_cooldown_timer = timer( false ), laser_cooldown_timer = timer( false ), lives = 3 }
 cur_level = 17
-powerup = { timer = timer( false ), falling = nil, owned = nil, interval = 3 }
+
 world = lovr.physics.newWorld( {
-	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup" },
-	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup" },
+	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile" },
+	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile" },
 	maxColliders = 512,
 	threadSafe = false,
 	tickRate = 60,
@@ -111,8 +135,10 @@ world:disableCollisionBetween( "ball", "ball" )
 world:disableCollisionBetween( "brick", "paddle" )
 world:disableCollisionBetween( "brick", "powerup" )
 world:disableCollisionBetween( "ball", "powerup" )
+world:disableCollisionBetween( "projectile", "powerup" )
+world:disableCollisionBetween( "projectile", "ball" )
+world:disableCollisionBetween( "projectile", "paddle" )
 paused = false
-
 phywire.options.wireframe = true
 phywire.options.overdraw = true
 math.randomseed( os.time() )

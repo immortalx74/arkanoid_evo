@@ -5,6 +5,8 @@ package.loaded[ ... ] = gameobject
 
 local util = require "util"
 local assets = require "assets"
+local powerup = require "powerup"
+local collision = require "collision"
 
 function gameobject:new( pose, type, transparent, color )
 	local obj = {}
@@ -63,10 +65,16 @@ function gameobject:new( pose, type, transparent, color )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
 	elseif type >= ASSET_TYPE.POWERUP_B and type <= ASSET_TYPE.POWERUP_S then
-		obj.collider = world:newCylinderCollider( lovr.math.newVec3( obj.pose ), METRICS.POWERUP_RADIUS, METRICS.POWERUP_LENGTH )
+		obj.collider = world:newCylinderCollider( vec3( obj.pose ), METRICS.POWERUP_RADIUS, METRICS.POWERUP_LENGTH )
 		obj.collider:setOrientation( math.pi / 2, 0, 1, 0 )
 		obj.collider:setTag( "powerup" )
 		obj.collider:setUserData( obj )
+		obj.collider:setSensor( true )
+	elseif type == ASSET_TYPE.PROJECTILE then
+		obj.collider = world:newCylinderCollider( vec3( obj.pose ), METRICS.PROJECTILE_RADIUS, METRICS.PROJECTILE_LENGTH )
+		obj.collider:setTag( "projectile" )
+		obj.collider:setUserData( obj )
+		obj.collider:setSensor( true )
 	end
 
 	table.insert( gameobjects_list, obj )
@@ -77,12 +85,6 @@ function gameobject:new( pose, type, transparent, color )
 end
 
 function gameobject:update( dt )
-	if lovr.headset.wasPressed( player.hand, "trigger" ) then
-		balls[ 1 ].pose:set( vec3( 0, 1.5, -2 ) )
-		balls[ 1 ].direction:set( 0.5, -0.1, -1 )
-		balls[ 1 ].collider:setPosition( vec3( balls[ 1 ].pose ) )
-	end
-
 	if self.type == ASSET_TYPE.BALL then
 		for i = 1, METRICS.SUBSTEPS do
 			-- paddle substep first (src, dst, stp = source, destination, current-step)
@@ -104,8 +106,8 @@ function gameobject:update( dt )
 			self.pose:translate( v )
 			self.collider:setPosition( vec3( self.pose ) )
 
-			util.brick_collision( self )
-			util.wall_collision( self )
+			collision.ball_to_brick( self )
+			collision.ball_to_wall( self )
 			local hit = util.paddle_collision( self )
 			if hit then
 				obj_paddle.pose:set( vec3( v_dst ), quat( q_dst ) )
@@ -117,35 +119,33 @@ function gameobject:update( dt )
 		end
 	elseif self.type >= ASSET_TYPE.POWERUP_B and self.type <= ASSET_TYPE.POWERUP_S then
 		if vec3( self.pose ).z < 0 then
-			local hit = util.powerup_collision( self )
+			local hit = collision.ball_to_powerup( self )
 			if hit then
 				local o = self.collider:getUserData()
-				powerup.owned = o.type
-				if powerup.owned == ASSET_TYPE.POWERUP_E then
-					obj_paddle:destroy()
-					obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_BIG )
-					obj_paddle_top:destroy()
-					obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP_BIG, true )
-					obj_paddle_spinner:destroy()
-					obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER_BIG )
-				elseif powerup.owned == ASSET_TYPE.POWERUP_L then
-					obj_paddle:destroy()
-					obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_LASER )
-					obj_paddle_top:destroy()
-					obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
-					obj_paddle_spinner:destroy()
-					obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER )
-					-- NOTE: add case to turn to normal again
-				end
+				powerup.acquire( o.type )
 				o:destroy()
 			else
-				self.pose:translate( 0, 0, 0.8 * dt )
+				self.pose:translate( 0, 0, METRICS.POWERUP_SPEED * dt )
 				self.collider:setPosition( vec3( self.pose ) )
 			end
 		else
 			powerup.falling = nil
 			local o = self.collider:getUserData()
 			o:destroy()
+		end
+	elseif self.type == ASSET_TYPE.PROJECTILE then
+		self.pose:translate( 0, 0, -METRICS.PROJECTILE_SPEED * dt )
+		self.collider:setPosition( vec3( self.pose ) )
+		local brick_collision, brick = collision.projectile_to_brick( self )
+
+		if brick_collision then
+			brick:destroy()
+			self:destroy()
+		else
+			local wall_collision = collision.projectile_to_wall( self )
+			if wall_collision then
+				self:destroy()
+			end
 		end
 	end
 end
