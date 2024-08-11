@@ -1,11 +1,12 @@
 -- TODO:
 -- silver bricks shouldn't spawn powerups
--- When exit gate is open you CAN collect any other powerup
+-- When exit gate is open you CAN collect any other powerup (and transform paddle too)
 -- max lives = 6
 -- collecting "life" powerup turns paddle to normal
 -- silver bricks start with strength = 2, increasing by 1 every 8 stages
 -- set playfield origin slightly forward (also let powerups travel a bit further on negative Z axis)
 -- "owned" powerup shouldn't change when catching life powerup
+-- projectiles have the same effect on bricks like ball (brick trength, can cause powerup to spawn)
 
 package.loaded[ ... ] = "globals"
 
@@ -82,7 +83,6 @@ METRICS = {
 
 	BRICK_WIDTH = 0.162,
 	BRICK_HEIGHT = 0.084,
-	-- BRICK_DEPTH = 0.084,
 	BRICK_DEPTH = 0.5,
 	BRICK_DIST_Z = 3.4,
 
@@ -107,11 +107,14 @@ METRICS = {
 
 	PROJECTILE_LENGTH = 0.05,
 	PROJECTILE_RADIUS = 0.01,
-	PROJECTILE_X_OFFSET = 0.09,
-	PROJECTILE_SPEED = 0.8,
+	PROJECTILE_SPAWN_X_OFFSET = 0.09,
+	PROJECTILE_SPEED = 5,
 
 	PADDLE_COOLDOWN_INTERVAL = 1,
-	LASER_COOLDOWN_INTERVAL = 0.5
+	LASER_COOLDOWN_INTERVAL = 0.5,
+
+	TRANSPARENCY_IDX_ROOM_GLASS = 1,
+	TRANSPARENCY_IDX_PADDLE_TOP = 2,
 }
 
 gameobjects_list = {}
@@ -119,7 +122,7 @@ game_state = GAME_STATE.INIT
 levels = {}
 balls = {}
 room_colliders = {}
-player = { contacted = false, hand = "left", paddle_cooldown_timer = timer( false ), laser_cooldown_timer = timer( false ), lives = 3 }
+player = { contacted = false, hand = "right", paddle_cooldown_timer = timer( false ), laser_cooldown_timer = timer( false ), lives = 3 }
 cur_level = 17
 
 world = lovr.physics.newWorld( {

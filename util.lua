@@ -47,115 +47,6 @@ function util.get_hit_face( nx, ny, nz )
 	return best_match
 end
 
-function util.brick_collision( cur_ball )
-	local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( cur_ball.collider:getShapes()[ 1 ], vec3( cur_ball.pose ), quat( cur_ball.pose ), "brick" )
-
-	if collider then
-		if collider:getTag() == "brick" then
-			local o = collider:getUserData()
-
-			local t = util.get_hit_face( nx, ny, nz )
-			local str = t[ 1 ]
-			local face_normal = t[ 2 ]
-
-			cur_ball.direction:set( util.reflection_vector( face_normal, cur_ball.direction ) )
-
-			if o.type == ASSET_TYPE.BRICK or o.type == ASSET_TYPE.BRICK_SILVER then
-				o.strength = o.strength - 1
-				if o.strength == 0 then
-					powerup.spawn( o.pose )
-					o:destroy()
-					assets[ ASSET_TYPE.SND_BALL_BRICK_DESTROY ]:stop()
-					assets[ ASSET_TYPE.SND_BALL_BRICK_DESTROY ]:play()
-				else
-					assets[ ASSET_TYPE.SND_BALL_BRICK_DING ]:stop()
-					assets[ ASSET_TYPE.SND_BALL_BRICK_DING ]:play()
-				end
-			else
-				assets[ ASSET_TYPE.SND_BALL_BRICK_DING ]:stop()
-				assets[ ASSET_TYPE.SND_BALL_BRICK_DING ]:play()
-			end
-
-			-- Do crude collision resolution
-			local v = vec3( cur_ball.pose )
-			cur_ball.pose:set( vec3( v.x - nx, v.y - ny, v.z - nz ) )
-			cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
-		end
-	end
-end
-
-function util.wall_collision( cur_ball )
-	local room = cur_ball.collider:getShapes()
-
-	for i, wall in ipairs( room ) do
-		local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( wall, vec3( cur_ball.pose ), quat( cur_ball.pose ), "wall_left wall_right wall_top wall_bottom wall_far wall_near" )
-		if collider then
-			local n = vec3()
-			local cur_ball_pos = vec3( cur_ball.pose )
-			if collider:getTag() == "wall_right" then
-				n:set( -1, 0, 0 )
-			elseif collider:getTag() == "wall_left" then
-				n:set( 1, 0, 0 )
-			elseif collider:getTag() == "wall_top" then
-				n:set( 0, -1, 0 )
-			elseif collider:getTag() == "wall_bottom" then
-				n:set( 0, 1, 0 )
-			elseif collider:getTag() == "wall_far" then
-				n:set( 0, 0, -1 )
-			elseif collider:getTag() == "wall_near" then
-				n:set( 0, 0, 1 )
-			end
-
-			cur_ball.pose:translate( -nx, -ny, -nz )
-			cur_ball.direction:set( util.reflection_vector( n, cur_ball.direction ) )
-		end
-	end
-end
-
-function util.powerup_collision( cur_powerup )
-	local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( cur_powerup.collider:getShapes()[ 1 ], vec3( cur_powerup.pose ), quat( cur_powerup.pose ), "paddle" )
-	if collider then
-		if collider:getTag() == "paddle" then
-			return true
-		end
-	end
-
-	return false
-end
-
-function util.paddle_collision( cur_ball )
-	if player.contacted then
-		if player.paddle_cooldown_timer:get_elapsed() >= METRICS.PADDLE_COOLDOWN_INTERVAL then
-			player.contacted = false
-			player.paddle_cooldown_timer:start()
-		end
-	else
-		local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( cur_ball.collider:getShapes()[ 1 ], vec3( cur_ball.pose ), quat( cur_ball.pose ), "paddle" )
-
-		if collider then
-			if collider:getTag() == "paddle" then
-				local m = mat4( obj_paddle.pose ):rotate( math.pi / 2, 1, 0, 0 )
-				local v = quat( m ):direction()
-
-				local dir = quat( obj_paddle.pose ):direction()
-				cur_ball.direction:set( util.reflection_vector( vec3( v ), cur_ball.direction ) )
-
-				-- Place ball slightly in front to prevent collision on subsequent frames
-				local v = vec3( cur_ball.pose )
-				cur_ball.pose:set( vec3( v.x - nx, v.y - ny, v.z - nz - 0.05 ) )
-				cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
-
-				player.contacted = true
-				assets[ ASSET_TYPE.SND_BALL_TO_PADDLE ]:stop()
-				assets[ ASSET_TYPE.SND_BALL_TO_PADDLE ]:play()
-				return true
-			end
-		end
-	end
-
-	return false
-end
-
 function util.setup_room_colliders( collider )
 	local thickness = 0.5
 	local half_thickness = METRICS.WALL_THICKNESS / 2
@@ -200,15 +91,15 @@ function util.spawn_paddle( paddle_type )
 
 	if paddle_type == ASSET_TYPE.PADDLE then
 		obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE )
-		obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
+		obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, METRICS.TRANSPARENCY_IDX_PADDLE_TOP )
 		obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER )
 	elseif paddle_type == ASSET_TYPE.PADDLE_BIG then
 		obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_BIG )
-		obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP_BIG, true )
+		obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP_BIG, METRICS.TRANSPARENCY_IDX_PADDLE_TOP )
 		obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER_BIG )
 	else
 		obj_paddle = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_LASER )
-		obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, true )
+		obj_paddle_top = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_TOP, METRICS.TRANSPARENCY_IDX_PADDLE_TOP )
 		obj_paddle_spinner = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.PADDLE_SPINNER )
 	end
 end
@@ -241,9 +132,7 @@ function util.generate_level()
 
 	util.spawn_paddle( ASSET_TYPE.PADDLE )
 	obj_room = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM )
-	obj_room_glass = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM_GLASS, true )
-
-	gameobject( vec3( 0, 1, -1 ), ASSET_TYPE.PROJECTILE )
+	obj_room_glass = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM_GLASS, METRICS.TRANSPARENCY_IDX_ROOM_GLASS )
 
 	player.paddle_cooldown_timer:start()
 	player.laser_cooldown_timer:start()

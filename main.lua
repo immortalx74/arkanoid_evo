@@ -26,7 +26,10 @@ function lovr.update( dt )
 			if lovr.headset.wasPressed( player.hand, "trigger" ) then
 				if player.laser_cooldown_timer:get_elapsed() >= METRICS.LASER_COOLDOWN_INTERVAL then
 					local x, y, z, angle, ax, ay, az = lovr.headset.getPose( player.hand )
-					gameobject( mat4( vec3( x, y, z ), quat( angle, ax, ay, az ) ), ASSET_TYPE.PROJECTILE )
+					local left = mat4( vec3( x, y, z ), quat( angle, ax, ay, az ) ):translate( -METRICS.PROJECTILE_SPAWN_X_OFFSET, 0, 0 ):rotate( -math.pi / 2, 1, 0, 0 )
+					local right = mat4( vec3( x, y, z ), quat( angle, ax, ay, az ) ):translate( METRICS.PROJECTILE_SPAWN_X_OFFSET, 0, 0 ):rotate( -math.pi / 2, 1, 0, 0 )
+					gameobject( left, ASSET_TYPE.PROJECTILE )
+					gameobject( right, ASSET_TYPE.PROJECTILE )
 					player.laser_cooldown_timer:start()
 				end
 			end

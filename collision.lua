@@ -79,6 +79,39 @@ function collision.ball_to_wall( cur_ball )
 	end
 end
 
+function collision.ball_to_paddle( cur_ball )
+	if player.contacted then
+		if player.paddle_cooldown_timer:get_elapsed() >= METRICS.PADDLE_COOLDOWN_INTERVAL then
+			player.contacted = false
+			player.paddle_cooldown_timer:start()
+		end
+	else
+		local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( cur_ball.collider:getShapes()[ 1 ], vec3( cur_ball.pose ), quat( cur_ball.pose ), "paddle" )
+
+		if collider then
+			if collider:getTag() == "paddle" then
+				local m = mat4( obj_paddle.pose ):rotate( math.pi / 2, 1, 0, 0 )
+				local v = quat( m ):direction()
+
+				local dir = quat( obj_paddle.pose ):direction()
+				cur_ball.direction:set( util.reflection_vector( vec3( v ), cur_ball.direction ) )
+
+				-- Place ball slightly in front to prevent collision on subsequent frames
+				local v = vec3( cur_ball.pose )
+				cur_ball.pose:set( vec3( v.x - nx, v.y - ny, v.z - nz - 0.05 ) )
+				cur_ball.collider:setPosition( vec3( cur_ball.pose ) )
+
+				player.contacted = true
+				assets[ ASSET_TYPE.SND_BALL_TO_PADDLE ]:stop()
+				assets[ ASSET_TYPE.SND_BALL_TO_PADDLE ]:play()
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
 function collision.projectile_to_brick( cur_proj )
 	local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( cur_proj.collider:getShapes()[ 1 ], vec3( cur_proj.pose ), quat( cur_proj.pose ), "brick" )
 

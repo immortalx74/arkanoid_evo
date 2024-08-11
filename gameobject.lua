@@ -79,7 +79,12 @@ function gameobject:new( pose, type, transparent, color )
 
 	table.insert( gameobjects_list, obj )
 	table.sort( gameobjects_list, function( a, b ) -- sort by transparency...
-		return b.transparent and not a.transparent
+		local val1 = a.transparent
+		local val2 = b.transparent
+
+		if not val1 then val1 = 0 end
+		if not val2 then val2 = 0 end
+		return val2 > val1
 	end )
 	return obj
 end
@@ -108,7 +113,7 @@ function gameobject:update( dt )
 
 			collision.ball_to_brick( self )
 			collision.ball_to_wall( self )
-			local hit = util.paddle_collision( self )
+			local hit = collision.ball_to_paddle( self )
 			if hit then
 				obj_paddle.pose:set( vec3( v_dst ), quat( q_dst ) )
 				obj_paddle_top.pose:set( vec3( v_dst ), quat( q_dst ) )
@@ -139,7 +144,13 @@ function gameobject:update( dt )
 		local brick_collision, brick = collision.projectile_to_brick( self )
 
 		if brick_collision then
-			brick:destroy()
+			if brick.type == ASSET_TYPE.BRICK or brick.type == ASSET_TYPE.BRICK_SILVER then
+				brick.strength = brick.strength - 1
+			end
+
+			if brick.strength == 0 then
+				brick:destroy()
+			end
 			self:destroy()
 		else
 			local wall_collision = collision.projectile_to_wall( self )
