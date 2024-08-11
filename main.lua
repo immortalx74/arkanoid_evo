@@ -31,6 +31,8 @@ function lovr.update( dt )
 					gameobject( left, ASSET_TYPE.PROJECTILE )
 					gameobject( right, ASSET_TYPE.PROJECTILE )
 					player.laser_cooldown_timer:start()
+					assets[ ASSET_TYPE.SND_LASER_SHOOT ]:stop()
+					assets[ ASSET_TYPE.SND_LASER_SHOOT ]:play()
 				end
 			end
 		end

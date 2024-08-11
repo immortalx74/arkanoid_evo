@@ -7,6 +7,8 @@
 -- set playfield origin slightly forward (also let powerups travel a bit further on negative Z axis)
 -- "owned" powerup shouldn't change when catching life powerup
 -- projectiles have the same effect on bricks like ball (brick trength, can cause powerup to spawn)
+-- prevent ball "extreme" reflection angles from paddle (favor Z direction)
+
 
 package.loaded[ ... ] = "globals"
 
@@ -111,7 +113,7 @@ METRICS = {
 	PROJECTILE_SPEED = 5,
 
 	PADDLE_COOLDOWN_INTERVAL = 1,
-	LASER_COOLDOWN_INTERVAL = 0.5,
+	LASER_COOLDOWN_INTERVAL = 0.12,
 
 	TRANSPARENCY_IDX_ROOM_GLASS = 1,
 	TRANSPARENCY_IDX_PADDLE_TOP = 2,
