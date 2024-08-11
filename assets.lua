@@ -34,7 +34,7 @@ function assets.load()
 	assets[ ASSET_TYPE.SND_LOST_LIFE ] = lovr.audio.newSource( "res/sounds/lost_life.wav" )
 	assets[ ASSET_TYPE.SND_MOTHERSHIP_INTRO ] = lovr.audio.newSource( "res/sounds/mothership_intro.wav" )
 	assets[ ASSET_TYPE.SND_PADDLE_AWAY ] = lovr.audio.newSource( "res/sounds/paddle_away.wav" )
-	assets[ ASSET_TYPE.SND_PADDLE_TURN_BIG ] = lovr.audio.newSource( "res/sounds/lost_life.wav" )
+	assets[ ASSET_TYPE.SND_PADDLE_TURN_BIG ] = lovr.audio.newSource( "res/sounds/paddle_turn_big.wav" )
 
 	assets[ ASSET_TYPE.POWERUP_B ] = lovr.graphics.newModel( "devres/powerup_b.glb" )
 	assets[ ASSET_TYPE.POWERUP_C ] = lovr.graphics.newModel( "devres/powerup_c.glb" )

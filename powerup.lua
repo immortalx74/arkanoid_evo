@@ -1,6 +1,7 @@
 local timer = require "timer"
 local gameobject = require "gameobject"
 local util = require "util"
+local assets = require "assets"
 
 powerup = {}
 
@@ -26,19 +27,24 @@ function powerup.spawn( brick_pose )
 end
 
 function powerup.acquire( pu_type )
+	local prev_owned = powerup.owned
 	powerup.owned = pu_type
 
 	if pu_type == ASSET_TYPE.POWERUP_E then
 		util.spawn_paddle( ASSET_TYPE.PADDLE_BIG )
+		assets[ ASSET_TYPE.SND_PADDLE_TURN_BIG ]:stop()
+		assets[ ASSET_TYPE.SND_PADDLE_TURN_BIG ]:play()
 	elseif pu_type == ASSET_TYPE.POWERUP_L then
 		util.spawn_paddle( ASSET_TYPE.PADDLE_LASER )
 	elseif pu_type == ASSET_TYPE.POWERUP_P then
 		if player.lives < 5 then
 			player.lives = player.lives + 1
 		end
-		if powerup.owned == ASSET_TYPE.POWERUP_E or powerup.owned == ASSET_TYPE.POWERUP_L then
+		if prev_owned == ASSET_TYPE.POWERUP_E or prev_owned == ASSET_TYPE.POWERUP_L then
 			util.spawn_paddle( ASSET_TYPE.PADDLE )
 		end
+		assets[ ASSET_TYPE.SND_GOT_LIFE ]:stop()
+		assets[ ASSET_TYPE.SND_GOT_LIFE ]:play()
 	end
 end
 
