@@ -105,9 +105,7 @@ function util.spawn_paddle( paddle_type )
 end
 
 function util.generate_level()
-	balls = {}
 	local ball = gameobject( vec3( -0.8, 1.6, -1 ), ASSET_TYPE.BALL )
-	table.insert( balls, ball )
 
 	local left = -(METRICS.ROOM_WIDTH / 2) + METRICS.GAP_LEFT + (METRICS.BRICK_WIDTH / 2)
 	local top = METRICS.ROOM_HEIGHT - METRICS.GAP_TOP + (METRICS.BRICK_HEIGHT / 2)

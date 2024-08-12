@@ -19,8 +19,13 @@ function gameobject:new( pose, type, transparent, color )
 	obj.color = color or false
 
 	if type == ASSET_TYPE.BALL then
+		obj.stick = false
 		obj.velocity = 2.8 / METRICS.SUBSTEPS
-		obj.direction = lovr.math.newVec3( 0.5, -0.2, -1 )
+		local rand_x = math.random( -20, 20 ) * 0.1
+		local rand_y = math.random( -20, 20 ) * 0.1
+		local rand_y = math.random( -20, 20 ) * 0.1
+		local rand_z = math.random( -20, -10 ) * 0.1
+		obj.direction = lovr.math.newVec3( rand_x, rand_y, -1 ):normalize()
 		obj.collider = world:newSphereCollider( lovr.math.newVec3( obj.pose ), METRICS.BALL_RADIUS )
 		obj.collider:setTag( "ball" )
 		obj.collider:setUserData( obj )
@@ -102,23 +107,28 @@ function gameobject:update( dt )
 			local v_stp = v_src:lerp( v_dst, n )
 			local q_stp = q_src:slerp( q_dst, n )
 
+			-- NOTE: Setting the paddle pose here to go hand-in-hand with ball substeps
 			obj_paddle.pose:set( vec3( v_stp ), quat( q_stp ) )
 			obj_paddle_top.pose:set( vec3( v_stp ), quat( q_stp ) )
 			obj_paddle_spinner.pose:set( vec3( v_stp ), quat( q_stp ) )
 			obj_paddle.collider:setPose( vec3( v_stp ), quat( q_stp ) )
 
-			local v = vec3( self.direction * self.velocity * dt )
-			self.pose:translate( v )
-			self.collider:setPosition( vec3( self.pose ) )
+			if not player.sticky_ball then
+				local v = vec3( self.direction * self.velocity * dt )
+				self.pose:translate( v )
+				self.collider:setPosition( vec3( self.pose ) )
+			else
+				self.pose:set( obj_paddle.pose ):translate( 0, -0.05, 0 )
+				self.collider:setPosition( vec3( self.pose ) )
+			end
 
 			collision.ball_to_brick( self )
 			collision.ball_to_wall( self )
 			local hit = collision.ball_to_paddle( self )
 			if hit then
-				obj_paddle.pose:set( vec3( v_dst ), quat( q_dst ) )
-				obj_paddle_top.pose:set( vec3( v_dst ), quat( q_dst ) )
-				obj_paddle_spinner.pose:set( vec3( v_dst ), quat( q_dst ) )
-				obj_paddle.collider:setPose( vec3( v_dst ), quat( q_dst ) )
+				if powerup.owned == ASSET_TYPE.POWERUP_C then
+					player.sticky_ball = self
+				end
 				break
 			end
 		end
@@ -149,6 +159,9 @@ function gameobject:update( dt )
 			end
 
 			if brick.strength == 0 then
+				if brick.type == ASSET_TYPE.BRICK then -- Only colored bricks can spawn powerups
+					powerup.spawn( brick.pose )
+				end
 				brick:destroy()
 			end
 			self:destroy()

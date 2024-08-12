@@ -1,14 +1,12 @@
 -- TODO:
--- silver bricks shouldn't spawn powerups
 -- When exit gate is open you CAN collect any other powerup (and transform paddle too)
 -- max lives = 6
--- collecting "life" powerup turns paddle to normal
+-- collecting "life" powerup turns paddle to normal (also deactivates "catch" powerup)
 -- silver bricks start with strength = 2, increasing by 1 every 8 stages
 -- set playfield origin slightly forward (also let powerups travel a bit further on negative Z axis)
 -- "owned" powerup shouldn't change when catching life powerup
--- projectiles have the same effect on bricks like ball (brick trength, can cause powerup to spawn)
 -- prevent ball "extreme" reflection angles from paddle (favor Z direction)
-
+-- The "disruption" powerup prevents other powerups to spawn, but when there's only one ball left it should return to normal
 
 package.loaded[ ... ] = "globals"
 
@@ -122,7 +120,6 @@ METRICS = {
 gameobjects_list = {}
 game_state = GAME_STATE.INIT
 levels = {}
-balls = {}
 room_colliders = {}
 player = { contacted = false, hand = "right", paddle_cooldown_timer = timer( false ), laser_cooldown_timer = timer( false ), lives = 3 }
 cur_level = 17

@@ -35,6 +35,21 @@ function lovr.update( dt )
 					assets[ ASSET_TYPE.SND_LASER_SHOOT ]:play()
 				end
 			end
+		elseif powerup.owned == ASSET_TYPE.POWERUP_C then
+			if lovr.headset.wasPressed( player.hand, "trigger" ) then
+				if player.sticky_ball then
+					player.sticky_ball:destroy()
+					player.sticky_ball = nil
+					local m = mat4( obj_paddle.pose ):rotate( -math.pi / 2, 1, 0, 0 )
+					local angle, ax, ay, az = m:getOrientation()
+					local q = quat( angle, ax, ay, az )
+					local v = vec3( q )
+					m:translate( 0, 0, -0.05 )
+					local ball = gameobject( vec3( m ), ASSET_TYPE.BALL )
+					ball.direction:set( v )
+					ball.direction:normalize()
+				end
+			end
 		end
 		gameobject.update_all( dt )
 	end

@@ -11,7 +11,7 @@ powerup.owned = nil
 powerup.interval = 3
 
 function powerup.spawn( brick_pose )
-	if powerup.timer:get_elapsed() > powerup.interval then
+	if powerup.timer:get_elapsed() > powerup.interval and powerup.owned ~= ASSET_TYPE.POWERUP_D then
 		local random_powerup = nil
 		while true do
 			random_powerup = math.random( ASSET_TYPE.POWERUP_B, ASSET_TYPE.POWERUP_S )
@@ -45,6 +45,12 @@ function powerup.acquire( pu_type )
 		end
 		assets[ ASSET_TYPE.SND_GOT_LIFE ]:stop()
 		assets[ ASSET_TYPE.SND_GOT_LIFE ]:play()
+	elseif pu_type == ASSET_TYPE.POWERUP_C then
+		util.spawn_paddle( ASSET_TYPE.PADDLE )
+	elseif pu_type == ASSET_TYPE.POWERUP_D then
+		util.spawn_paddle( ASSET_TYPE.PADDLE )
+		gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.BALL )
+		gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.BALL )
 	end
 end
 
