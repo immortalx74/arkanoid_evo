@@ -118,7 +118,7 @@ function gameobject:update( dt )
 				self.pose:translate( v )
 				self.collider:setPosition( vec3( self.pose ) )
 			else
-				self.pose:set( obj_paddle.pose ):translate( 0, -0.05, 0 )
+				self.pose:set( obj_paddle.pose ):translate( 0, -0.04, 0 )
 				self.collider:setPosition( vec3( self.pose ) )
 			end
 

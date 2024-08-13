@@ -55,13 +55,18 @@ ASSET_TYPE = {
 	PADDLE_TOP_BIG = 36,
 	PADDLE_SPINNER_BIG = 37,
 	PADDLE_LASER = 38,
-	PROJECTILE = 39
+	PROJECTILE = 39,
+	ARKANOID_LOGO = 40,
+	MOTHERSHIP = 41,
+	TAITO_LOGO = 42,
+	FONT = 43
 }
 
 GAME_STATE = {
 	INIT = 1,
-	GENERATE_LEVEL = 2,
-	PLAY = 3
+	START_SCREEN = 2,
+	GENERATE_LEVEL = 3,
+	PLAY = 4
 }
 
 BRICK_COLORS = {
@@ -117,6 +122,8 @@ METRICS = {
 	TRANSPARENCY_IDX_PADDLE_TOP = 2,
 }
 
+obj_arkanoid_logo = nil
+obj_taito_logo = nil
 gameobjects_list = {}
 game_state = GAME_STATE.INIT
 levels = {}
@@ -140,7 +147,7 @@ world:disableCollisionBetween( "ball", "powerup" )
 world:disableCollisionBetween( "projectile", "powerup" )
 world:disableCollisionBetween( "projectile", "ball" )
 world:disableCollisionBetween( "projectile", "paddle" )
-paused = false
+
 phywire.options.wireframe = true
 phywire.options.overdraw = true
 math.randomseed( os.time() )

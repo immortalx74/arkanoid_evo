@@ -4,6 +4,11 @@ local util = require "util"
 local assets = {}
 
 function assets.load()
+	assets[ ASSET_TYPE.ARKANOID_LOGO ] = lovr.graphics.newModel( "devres/arkanoid_logo.glb" )
+	assets[ ASSET_TYPE.MOTHERSHIP ] = lovr.graphics.newModel( "devres/mothership.glb" )
+	assets[ ASSET_TYPE.TAITO_LOGO ] = lovr.graphics.newModel( "devres/taito_logo.glb" )
+	assets[ ASSET_TYPE.FONT ] = lovr.graphics.newFont( "res/fonts/PressStart2P-Regular.ttf" )
+
 	assets[ ASSET_TYPE.PADDLE ] = lovr.graphics.newModel( "devres/paddle.glb" )
 	assets[ ASSET_TYPE.PADDLE_TOP ] = lovr.graphics.newModel( "devres/paddle_top.glb" )
 	assets[ ASSET_TYPE.PADDLE_SPINNER ] = lovr.graphics.newModel( "devres/spinner.glb" )
