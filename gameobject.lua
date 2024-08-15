@@ -80,8 +80,6 @@ function gameobject:new( pose, type, transparent, color )
 		obj.collider:setTag( "projectile" )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
-	elseif type == ASSET_TYPE.PADDLE_ESCAPE then
-		print( "generated" )
 	end
 
 	table.insert( gameobjects_list, obj )

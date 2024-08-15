@@ -43,9 +43,17 @@ function lovr.update( dt )
 			assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:play()
 			enemy_ship_timer:stop()
 		end
-	elseif game_state == GAME_STATE.GENERATE_LEVEL then		
+	elseif game_state == GAME_STATE.GENERATE_LEVEL then
 		util.generate_level()
-		game_state = GAME_STATE.PLAY
+		game_state = GAME_STATE.LEVEL_INTRO
+		level_intro_timer:start()
+		assets[ ASSET_TYPE.SND_LEVEL_INTRO ]:stop()
+		assets[ ASSET_TYPE.SND_LEVEL_INTRO ]:play()
+	elseif game_state == GAME_STATE.LEVEL_INTRO then
+		if level_intro_timer:get_elapsed() > 3 then
+			local ball = gameobject( vec3( -0.8, 1.6, -1 ), ASSET_TYPE.BALL )
+			game_state = GAME_STATE.PLAY
+		end
 	elseif game_state == GAME_STATE.PLAY then
 		if powerup.owned == ASSET_TYPE.POWERUP_L then
 			if lovr.headset.wasPressed( player.hand, "trigger" ) then
@@ -116,25 +124,14 @@ function lovr.draw( pass )
 			phrases[ 8 ]:draw( pass )
 			phrases[ 9 ]:draw( pass )
 		end
-		-- if phrases[ phrases.current ]:has_finished() then
-		-- 	if phrases.current < #phrases then
-		-- 		phrases.current = phrases.current + 1
-		-- 		phrases[ phrases.current ]:start()
-		-- 	else
-		-- 		if not phrases.last_timer.started then
-		-- 			phrases.last_timer:start()
-		-- 		end
-		-- 	end
-		-- end
-
-		-- if phrases.current == 9 and phrases.last_timer:get_elapsed() > 7 then
-		-- 	game_state = GAME_STATE.GENERATE_LEVEL
-		-- elseif phrases.current == 9 and phrases.last_timer:get_elapsed() > 4 and not assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:isPlaying() then
-		-- 	assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:play()
-		-- 	enemy_ship_timer:stop()
-		-- end
 	elseif game_state == GAME_STATE.PLAY then
 		-- phywire.draw( pass, world )
+	elseif game_state == GAME_STATE.LEVEL_INTRO then
+		pass:setShader()
+		pass:text( "ROUND 1", vec3( 0, 1.2, -2 ), 0.06 )
+		if level_intro_timer:get_elapsed() > 1 then
+			pass:text( "START", vec3( 0, 1.1, -2 ), 0.06 )
+		end
 	end
 
 	gameobject.draw_all( pass )

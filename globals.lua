@@ -71,7 +71,8 @@ GAME_STATE = {
 	START_SCREEN = 2,
 	MOTHERSHIP_INTRO = 3,
 	GENERATE_LEVEL = 4,
-	PLAY = 5
+	LEVEL_INTRO = 5,
+	PLAY = 6
 }
 
 BRICK_COLORS = {
@@ -137,6 +138,7 @@ game_state = GAME_STATE.INIT
 levels = {}
 room_colliders = {}
 player = { contacted = false, hand = "right", paddle_cooldown_timer = timer( false ), laser_cooldown_timer = timer( false ), lives = 3 }
+level_intro_timer = timer( false )
 cur_level = 17
 
 world = lovr.physics.newWorld( {
