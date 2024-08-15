@@ -13,7 +13,7 @@ function timer:start()
 	self.started = true
 end
 
-function timer.stop()
+function timer:stop()
 	self.start_time = 0
 	self.started = false
 end

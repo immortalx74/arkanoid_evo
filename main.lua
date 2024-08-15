@@ -3,32 +3,47 @@ local gameobject = require "gameobject"
 local assets = require "assets"
 local util = require "util"
 local powerup = require "powerup"
-local timer = require "timer"
+local typewriter = require "typewriter"
 
 function lovr.load()
 	assets.load()
 	assets.load_levels()
-	-- game_state = GAME_STATE.GENERATE_LEVEL
 end
 
 function lovr.update( dt )
 	if game_state == GAME_STATE.INIT then
-		obj_arkanoid_logo = gameobject( vec3( 0, 2, -2 ), ASSET_TYPE.ARKANOID_LOGO )
-		obj_taito_logo = gameobject( vec3( 0, 0.65, -2 ), ASSET_TYPE.TAITO_LOGO )
-		game_state = GAME_STATE.START_SCREEN
+		util.create_start_screen()
 	elseif game_state == GAME_STATE.START_SCREEN then
 		if lovr.headset.wasPressed( "left", "trigger" ) then
-			player.hand = "left"
-			obj_arkanoid_logo:destroy()
-			obj_taito_logo:destroy()
-			game_state = GAME_STATE.GENERATE_LEVEL
+			util.create_mothership_intro( "left" )
+			game_state = GAME_STATE.MOTHERSHIP_INTRO
 		elseif lovr.headset.wasPressed( "right", "trigger" ) then
-			player.hand = "right"
-			obj_arkanoid_logo:destroy()
-			obj_taito_logo:destroy()
+			util.create_mothership_intro( "right" )
+			game_state = GAME_STATE.MOTHERSHIP_INTRO
+		end
+	elseif game_state == GAME_STATE.MOTHERSHIP_INTRO then
+		if lovr.headset.wasPressed( player.hand, "trigger" ) then
 			game_state = GAME_STATE.GENERATE_LEVEL
 		end
-	elseif game_state == GAME_STATE.GENERATE_LEVEL then
+
+		if phrases[ phrases.current ]:has_finished() then
+			if phrases.current < #phrases then
+				phrases.current = phrases.current + 1
+				phrases[ phrases.current ]:start()
+			else
+				if not phrases.last_timer.started then
+					phrases.last_timer:start()
+				end
+			end
+		end
+
+		if phrases.current == 9 and phrases.last_timer:get_elapsed() > 7 then
+			game_state = GAME_STATE.GENERATE_LEVEL
+		elseif phrases.current == 9 and phrases.last_timer:get_elapsed() > 4 and not assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:isPlaying() then
+			assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:play()
+			enemy_ship_timer:stop()
+		end
+	elseif game_state == GAME_STATE.GENERATE_LEVEL then		
 		util.generate_level()
 		game_state = GAME_STATE.PLAY
 	elseif game_state == GAME_STATE.PLAY then
@@ -61,7 +76,6 @@ function lovr.update( dt )
 				end
 			end
 		end
-		-- gameobject.update_all( dt )
 	end
 
 	gameobject.update_all( dt )
@@ -83,8 +97,43 @@ function lovr.draw( pass )
 		pass:text( "ALL RIGHTS RESERVED", vec3( 0, 0.4, -2 ), 0.06 )
 		pass:text( "This is a free, open source project made for fun.", vec3( 0, 0.3, -2 ), 0.03 )
 		pass:text( "No copyright infringement is intended", vec3( 0, 0.25, -2 ), 0.03 )
+	elseif game_state == GAME_STATE.MOTHERSHIP_INTRO then
+		pass:setShader()
+		obj_enemy_ship.model:animate( 1, enemy_ship_timer:get_elapsed() )
+		obj_enemy_laser_beam.model:animate( 1, enemy_ship_timer:get_elapsed() )
+		obj_paddle_escape.model:animate( 1, enemy_ship_timer:get_elapsed() )
+
+		if phrases.current < 3 then
+			phrases[ 1 ]:draw( pass )
+			phrases[ 2 ]:draw( pass )
+		elseif phrases.current < 7 then
+			phrases[ 3 ]:draw( pass )
+			phrases[ 4 ]:draw( pass )
+			phrases[ 5 ]:draw( pass )
+			phrases[ 6 ]:draw( pass )
+		else
+			phrases[ 7 ]:draw( pass )
+			phrases[ 8 ]:draw( pass )
+			phrases[ 9 ]:draw( pass )
+		end
+		-- if phrases[ phrases.current ]:has_finished() then
+		-- 	if phrases.current < #phrases then
+		-- 		phrases.current = phrases.current + 1
+		-- 		phrases[ phrases.current ]:start()
+		-- 	else
+		-- 		if not phrases.last_timer.started then
+		-- 			phrases.last_timer:start()
+		-- 		end
+		-- 	end
+		-- end
+
+		-- if phrases.current == 9 and phrases.last_timer:get_elapsed() > 7 then
+		-- 	game_state = GAME_STATE.GENERATE_LEVEL
+		-- elseif phrases.current == 9 and phrases.last_timer:get_elapsed() > 4 and not assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:isPlaying() then
+		-- 	assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:play()
+		-- 	enemy_ship_timer:stop()
+		-- end
 	elseif game_state == GAME_STATE.PLAY then
-		-- gameobject.draw_all( pass )
 		-- phywire.draw( pass, world )
 	end
 

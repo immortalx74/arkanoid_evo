@@ -5,6 +5,16 @@ package.loaded[ ... ] = util
 local gameobject = require "gameobject"
 local assets = require "assets"
 local powerup = require "powerup"
+local timer = require "timer"
+
+function util.sort_transparency( a, b )
+	local val1 = a.transparent
+	local val2 = b.transparent
+
+	if not val1 then val1 = 0 end
+	if not val2 then val2 = 0 end
+	return val2 > val1
+end
 
 function util.split( input )
 	local stripped = input:gsub( "[\r\n,]", "" ) -- Remove newlines and commas
@@ -105,6 +115,8 @@ function util.spawn_paddle( paddle_type )
 end
 
 function util.generate_level()
+	gameobject.destroy_all()
+
 	local ball = gameobject( vec3( -0.8, 1.6, -1 ), ASSET_TYPE.BALL )
 
 	local left = -(METRICS.ROOM_WIDTH / 2) + METRICS.GAP_LEFT + (METRICS.BRICK_WIDTH / 2)
@@ -135,6 +147,30 @@ function util.generate_level()
 	player.paddle_cooldown_timer:start()
 	player.laser_cooldown_timer:start()
 	powerup.timer:start()
+end
+
+function util.create_start_screen()
+	obj_arkanoid_logo = gameobject( vec3( 0, 2, -2 ), ASSET_TYPE.ARKANOID_LOGO )
+	obj_taito_logo = gameobject( vec3( 0, 0.65, -2 ), ASSET_TYPE.TAITO_LOGO )
+	game_state = GAME_STATE.START_SCREEN
+end
+
+function util.create_mothership_intro( hand )
+	player.hand = hand
+	obj_arkanoid_logo:destroy()
+	obj_taito_logo:destroy()
+	obj_mothership = gameobject( vec3( 0, -0.8, -3 ), ASSET_TYPE.MOTHERSHIP )
+	obj_mothership.pose:rotate( -0.8, 0, 1, 0 )
+
+	obj_enemy_ship = gameobject( vec3( 0, -0.8, -3 ), ASSET_TYPE.ENEMY_SHIP )
+	obj_enemy_laser_beam = gameobject( vec3( 0, -0.8, -3 ), ASSET_TYPE.ENEMY_LASER_BEAM )
+	obj_paddle_escape = gameobject( vec3( 0, -0.87, -3 ), ASSET_TYPE.PADDLE_ESCAPE )
+	enemy_ship_timer = timer( true )
+	
+	assets[ ASSET_TYPE.SND_MOTHERSHIP_INTRO ]:stop()
+	assets[ ASSET_TYPE.SND_MOTHERSHIP_INTRO ]:play()
+	
+	game_state = GAME_STATE.MOTHERSHIP_INTRO
 end
 
 return util

@@ -14,6 +14,7 @@ package.loaded[ ... ] = "globals"
 local timer = require "timer"
 local util = require "util"
 local assets = require "assets"
+local typewriter = require "typewriter"
 phywire = require "phywire"
 
 ASSET_TYPE = {
@@ -59,14 +60,18 @@ ASSET_TYPE = {
 	ARKANOID_LOGO = 40,
 	MOTHERSHIP = 41,
 	TAITO_LOGO = 42,
-	FONT = 43
+	FONT = 43,
+	ENEMY_SHIP = 44,
+	ENEMY_LASER_BEAM = 45,
+	PADDLE_ESCAPE = 46
 }
 
 GAME_STATE = {
 	INIT = 1,
 	START_SCREEN = 2,
-	GENERATE_LEVEL = 3,
-	PLAY = 4
+	MOTHERSHIP_INTRO = 3,
+	GENERATE_LEVEL = 4,
+	PLAY = 5
 }
 
 BRICK_COLORS = {
@@ -124,6 +129,9 @@ METRICS = {
 
 obj_arkanoid_logo = nil
 obj_taito_logo = nil
+obj_mothership = nil
+
+
 gameobjects_list = {}
 game_state = GAME_STATE.INIT
 levels = {}
@@ -151,3 +159,16 @@ world:disableCollisionBetween( "projectile", "paddle" )
 phywire.options.wireframe = true
 phywire.options.overdraw = true
 math.randomseed( os.time() )
+
+phrases = { current = 1, last_timer = timer( false ) }
+table.insert( phrases, typewriter( "THE ERA AND TIME OF", vec3( -0.5, 1.5, -2 ), 0.02, true ) )
+table.insert( phrases, typewriter( "THIS STORY IS UNKNOWN.", vec3( -0.5, 1.4, -2 ), 0.02, false ) )
+
+table.insert( phrases, typewriter( "AFTER THE MOTHERSHIP", vec3( -0.5, 1.5, -2 ), 0.02, false ) )
+table.insert( phrases, typewriter( '"ARKANOID" WAS DESTROYED,', vec3( -0.5, 1.4, -2 ), 0.02, false ) )
+table.insert( phrases, typewriter( 'A SPACECRAFT "VAUS"', vec3( -0.5, 1.3, -2 ), 0.02, false ) )
+table.insert( phrases, typewriter( "SCRAMBLED AWAY FROM IT.", vec3( -0.5, 1.2, -2 ), 0.02, false ) )
+
+table.insert( phrases, typewriter( "BUT ONLY TO BE", vec3( -0.5, 1.5, -2 ), 0.02, false ) )
+table.insert( phrases, typewriter( "TRAPPED IN SPACE WARPED", vec3( -0.5, 1.4, -2 ), 0.02, false ) )
+table.insert( phrases, typewriter( "BY SOMEONE........", vec3( -0.5, 1.3, -2 ), 0.02, false ) )

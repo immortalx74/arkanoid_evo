@@ -80,17 +80,12 @@ function gameobject:new( pose, type, transparent, color )
 		obj.collider:setTag( "projectile" )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
+	elseif type == ASSET_TYPE.PADDLE_ESCAPE then
+		print( "generated" )
 	end
 
 	table.insert( gameobjects_list, obj )
-	table.sort( gameobjects_list, function( a, b ) -- sort by transparency...
-		local val1 = a.transparent
-		local val2 = b.transparent
-
-		if not val1 then val1 = 0 end
-		if not val2 then val2 = 0 end
-		return val2 > val1
-	end )
+	table.sort( gameobjects_list, util.sort_transparency )
 	return obj
 end
 
@@ -206,10 +201,21 @@ function gameobject:destroy()
 			if v.collider then
 				v.collider:destroy()
 			end
+
 			table.remove( gameobjects_list, i )
 			break
 		end
 	end
+end
+
+function gameobject.destroy_all()
+	for i, v in ipairs( gameobjects_list ) do
+		if v.collider then
+			v.collider:destroy()
+		end
+	end
+
+	gameobjects_list = {}
 end
 
 function gameobject.update_all( dt )
