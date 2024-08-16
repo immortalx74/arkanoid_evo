@@ -30,9 +30,9 @@ end
 function typewriter:draw( pass )
 	if self.started then
 		local char_count = #self.text_writer
-		local char_width = (assets[ ASSET_TYPE.FONT ]:getWidth( "W" )) * 0.06
+		local char_width = (assets[ ASSET_TYPE.FONT ]:getWidth( "W" )) * METRICS.TEXT_SCALE_BIG
 		local half = (char_count * char_width) / 2
-		pass:text( self.text_writer, self.position.x + half, self.position.y, self.position.z, 0.06 )
+		pass:text( self.text_writer, self.position.x + half, self.position.y, self.position.z, METRICS.TEXT_SCALE_BIG )
 
 		if not self.finished and self.timer:get_elapsed() > self.interval then
 			self.text_writer = string.sub( self.text, 1, self.cursor )

@@ -169,7 +169,7 @@ end
 
 function gameobject:draw( pass )
 	if self.transparent then
-		pass:setShader()
+		pass:setShader( assets[ ASSET_TYPE.SHADER_UNLIT ] )
 	else
 		pass:setShader( assets[ ASSET_TYPE.SHADER_PBR ] )
 	end

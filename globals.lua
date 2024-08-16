@@ -63,7 +63,8 @@ ASSET_TYPE = {
 	FONT = 43,
 	ENEMY_SHIP = 44,
 	ENEMY_LASER_BEAM = 45,
-	PADDLE_ESCAPE = 46
+	PADDLE_ESCAPE = 46,
+	SHADER_UNLIT = 47
 }
 
 GAME_STATE = {
@@ -126,6 +127,9 @@ METRICS = {
 
 	TRANSPARENCY_IDX_ROOM_GLASS = 1,
 	TRANSPARENCY_IDX_PADDLE_TOP = 2,
+
+	TEXT_SCALE_BIG = 0.06,
+	TEXT_SCALE_SMALL = 0.03
 }
 
 obj_arkanoid_logo = nil
@@ -174,3 +178,5 @@ table.insert( phrases, typewriter( "SCRAMBLED AWAY FROM IT.", vec3( -0.5, 1.2, -
 table.insert( phrases, typewriter( "BUT ONLY TO BE", vec3( -0.5, 1.5, -2 ), 0.02, false ) )
 table.insert( phrases, typewriter( "TRAPPED IN SPACE WARPED", vec3( -0.5, 1.4, -2 ), 0.02, false ) )
 table.insert( phrases, typewriter( "BY SOMEONE........", vec3( -0.5, 1.3, -2 ), 0.02, false ) )
+
+starfield = { points = {} }

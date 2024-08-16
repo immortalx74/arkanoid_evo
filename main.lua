@@ -8,6 +8,7 @@ local typewriter = require "typewriter"
 function lovr.load()
 	assets.load()
 	assets.load_levels()
+	util.create_starfield()
 end
 
 function lovr.update( dt )
@@ -86,6 +87,7 @@ function lovr.update( dt )
 		end
 	end
 
+	util.move_starfield( dt )
 	gameobject.update_all( dt )
 end
 
@@ -100,11 +102,11 @@ function lovr.draw( pass )
 
 	if game_state == GAME_STATE.START_SCREEN then
 		pass:setShader()
-		pass:text( "PRESS LEFT OR RIGHT TRIGGER TO START!", vec3( 0, 1.2, -2 ), 0.06 )
-		pass:text( "© 1986 TAITO CORP JAPAN", vec3( 0, 0.5, -2 ), 0.06 )
-		pass:text( "ALL RIGHTS RESERVED", vec3( 0, 0.4, -2 ), 0.06 )
-		pass:text( "This is a free, open source project made for fun.", vec3( 0, 0.3, -2 ), 0.03 )
-		pass:text( "No copyright infringement is intended", vec3( 0, 0.25, -2 ), 0.03 )
+		pass:text( "PRESS LEFT OR RIGHT TRIGGER TO START!", vec3( 0, 1.2, -2 ), METRICS.TEXT_SCALE_BIG )
+		pass:text( "© 1986 TAITO CORP JAPAN", vec3( 0, 0.5, -2 ), METRICS.TEXT_SCALE_BIG )
+		pass:text( "ALL RIGHTS RESERVED", vec3( 0, 0.4, -2 ), METRICS.TEXT_SCALE_BIG )
+		pass:text( "This is a free, open source project made for fun.", vec3( 0, 0.3, -2 ), METRICS.TEXT_SCALE_SMALL )
+		pass:text( "No copyright infringement is intended", vec3( 0, 0.25, -2 ), METRICS.TEXT_SCALE_SMALL )
 	elseif game_state == GAME_STATE.MOTHERSHIP_INTRO then
 		pass:setShader()
 		obj_enemy_ship.model:animate( 1, enemy_ship_timer:get_elapsed() )
@@ -128,11 +130,12 @@ function lovr.draw( pass )
 		-- phywire.draw( pass, world )
 	elseif game_state == GAME_STATE.LEVEL_INTRO then
 		pass:setShader()
-		pass:text( "ROUND 1", vec3( 0, 1.2, -2 ), 0.06 )
+		pass:text( "ROUND 1", vec3( 0, 1.2, -2 ), METRICS.TEXT_SCALE_BIG )
 		if level_intro_timer:get_elapsed() > 1 then
-			pass:text( "START", vec3( 0, 1.1, -2 ), 0.06 )
+			pass:text( "START", vec3( 0, 1.1, -2 ), METRICS.TEXT_SCALE_BIG )
 		end
 	end
 
+	util.draw_starfield( pass )
 	gameobject.draw_all( pass )
 end

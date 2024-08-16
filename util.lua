@@ -153,6 +153,17 @@ function util.create_start_screen()
 	game_state = GAME_STATE.START_SCREEN
 end
 
+function util.point_in_volume( px, py, pz, vx, vy, vz, vw, vh, vd )
+	if px > vx - (vw / 2) and px < vx + (vw / 2) and
+		py > vy - (vh / 2) and py < vy + (vh / 2) and
+		pz > vz - (vd / 2) and pz < vz + (vd / 2)
+	then
+		return true
+	end
+
+	return false
+end
+
 function util.create_mothership_intro( hand )
 	player.hand = hand
 	obj_arkanoid_logo:destroy()
@@ -164,11 +175,49 @@ function util.create_mothership_intro( hand )
 	obj_enemy_laser_beam = gameobject( vec3( 0, -0.8, -3 ), ASSET_TYPE.ENEMY_LASER_BEAM )
 	obj_paddle_escape = gameobject( vec3( 0, -0.87, -3 ), ASSET_TYPE.PADDLE_ESCAPE )
 	enemy_ship_timer = timer( true )
-	
+
 	assets[ ASSET_TYPE.SND_MOTHERSHIP_INTRO ]:stop()
 	assets[ ASSET_TYPE.SND_MOTHERSHIP_INTRO ]:play()
-	
+
 	game_state = GAME_STATE.MOTHERSHIP_INTRO
+end
+
+function util.create_starfield()
+	for i = 1, 1000 do
+		local rx = math.random( -10, 10 )
+		local ry = math.random( -10, 10 )
+		local rz = math.random( -50, 49 )
+		local rs = math.random( 1, 3 )
+		table.insert( starfield, { rx, ry, rz, rs } )
+	end
+end
+
+function util.move_starfield( dt )
+	if game_state == GAME_STATE.LEVEL_INTRO or game_state == GAME_STATE.PLAY then
+		starfield.points = {}
+		for i, v in ipairs( starfield ) do
+			v[ 3 ] = v[ 3 ] + (v[ 4 ] * dt)
+
+			if v[ 3 ] > 50 then v[ 3 ] = -50 end
+
+			if not util.point_in_volume( v[ 1 ], v[ 2 ], v[ 3 ], 0, 1.1, -1.5, 2.2, 2.2, 5 ) then
+				table.insert( starfield.points, v[ 1 ] )
+				table.insert( starfield.points, v[ 2 ] )
+				table.insert( starfield.points, v[ 3 ] )
+			end
+		end
+	end
+end
+
+function util.draw_starfield( pass )
+	if game_state == GAME_STATE.LEVEL_INTRO or game_state == GAME_STATE.PLAY then
+		pass:setShader( assets[ ASSET_TYPE.SHADER_UNLIT ] )
+		pass:setColor( 1, 1, 1 )
+		pass:points( starfield.points )
+		pass:setShader( assets[ ASSET_TYPE.SHADER_PBR ] )
+		pass:send( 'cubemap', assets[ ASSET_TYPE.SKYBOX ] )
+		pass:send( 'sphericalHarmonics', assets[ ASSET_TYPE.SPHERICAL_HARMONICS ] )
+	end
 end
 
 return util
