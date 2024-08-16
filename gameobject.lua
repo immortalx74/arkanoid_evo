@@ -180,6 +180,8 @@ function gameobject:draw( pass )
 
 	if self.type == ASSET_TYPE.PADDLE_SPINNER then
 		self.model:animate( 1, lovr.timer.getTime() )
+	elseif self.type == ASSET_TYPE.ENEMY_BALOONS or self.type == ASSET_TYPE.ENEMY_CONE or self.type == ASSET_TYPE.ENEMY_PYRAMID then
+		self.model:animate( 1, lovr.timer.getTime() )
 	elseif self.type >= ASSET_TYPE.POWERUP_B and self.type <= ASSET_TYPE.POWERUP_S then
 		self.model:animate( 1, lovr.timer.getTime() )
 	elseif self.type == ASSET_TYPE.PADDLE or self.type == ASSET_TYPE.PADDLE_BIG or self.type == ASSET_TYPE.PADDLE_LASER then
