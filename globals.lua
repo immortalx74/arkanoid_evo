@@ -146,7 +146,7 @@ levels = {}
 room_colliders = {}
 player = { contacted = false, hand = "right", paddle_cooldown_timer = timer( false ), laser_cooldown_timer = timer( false ), lives = 3 }
 level_intro_timer = timer( false )
-cur_level = 17
+cur_level = 1
 
 world = lovr.physics.newWorld( {
 	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile" },
@@ -169,7 +169,7 @@ phywire.options.wireframe = true
 phywire.options.overdraw = true
 math.randomseed( os.time() )
 
-phrases = { current = 1, last_timer = timer( false ) }
+phrases = { idx = 1, last_timer = timer( false ) }
 table.insert( phrases, typewriter( "THE ERA AND TIME OF", vec3( -0.5, 1.5, -2 ), 0.02, true ) )
 table.insert( phrases, typewriter( "THIS STORY IS UNKNOWN.", vec3( -0.5, 1.4, -2 ), 0.02, false ) )
 

@@ -24,13 +24,14 @@ function lovr.update( dt )
 		end
 	elseif game_state == GAME_STATE.MOTHERSHIP_INTRO then
 		if lovr.headset.wasPressed( player.hand, "trigger" ) then
+			assets[ ASSET_TYPE.SND_MOTHERSHIP_INTRO ]:stop()
 			game_state = GAME_STATE.GENERATE_LEVEL
 		end
 
-		if phrases[ phrases.current ]:has_finished() then
-			if phrases.current < #phrases then
-				phrases.current = phrases.current + 1
-				phrases[ phrases.current ]:start()
+		if phrases[ phrases.idx ]:has_finished() then
+			if phrases.idx < #phrases then
+				phrases.idx = phrases.idx + 1
+				phrases[ phrases.idx ]:start()
 			else
 				if not phrases.last_timer.started then
 					phrases.last_timer:start()
@@ -38,9 +39,9 @@ function lovr.update( dt )
 			end
 		end
 
-		if phrases.current == 9 and phrases.last_timer:get_elapsed() > 7 then
+		if phrases.idx == 9 and phrases.last_timer:get_elapsed() > 7 then
 			game_state = GAME_STATE.GENERATE_LEVEL
-		elseif phrases.current == 9 and phrases.last_timer:get_elapsed() > 4 and not assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:isPlaying() then
+		elseif phrases.idx == 9 and phrases.last_timer:get_elapsed() > 4 and not assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:isPlaying() then
 			assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:play()
 			enemy_ship_timer:stop()
 		end
@@ -85,6 +86,15 @@ function lovr.update( dt )
 				end
 			end
 		end
+
+		local bricks_left = util.get_bricks_left()
+		if bricks_left == 0 then
+			local num_levels = #levels
+			if cur_level < num_levels then
+				cur_level = cur_level + 1
+				game_state = GAME_STATE.GENERATE_LEVEL
+			end
+		end
 	end
 
 	util.move_starfield( dt )
@@ -113,10 +123,10 @@ function lovr.draw( pass )
 		obj_enemy_laser_beam.model:animate( 1, enemy_ship_timer:get_elapsed() )
 		obj_paddle_escape.model:animate( 1, enemy_ship_timer:get_elapsed() )
 
-		if phrases.current < 3 then
+		if phrases.idx < 3 then
 			phrases[ 1 ]:draw( pass )
 			phrases[ 2 ]:draw( pass )
-		elseif phrases.current < 7 then
+		elseif phrases.idx < 7 then
 			phrases[ 3 ]:draw( pass )
 			phrases[ 4 ]:draw( pass )
 			phrases[ 5 ]:draw( pass )

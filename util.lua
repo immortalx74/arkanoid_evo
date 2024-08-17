@@ -141,7 +141,6 @@ function util.generate_level()
 	util.spawn_paddle( ASSET_TYPE.PADDLE )
 	obj_room = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM )
 	obj_room_glass = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM_GLASS, METRICS.TRANSPARENCY_IDX_ROOM_GLASS )
-
 	player.paddle_cooldown_timer:start()
 	player.laser_cooldown_timer:start()
 	powerup.timer:start()
@@ -218,6 +217,18 @@ function util.draw_starfield( pass )
 		pass:send( 'cubemap', assets[ ASSET_TYPE.SKYBOX ] )
 		pass:send( 'sphericalHarmonics', assets[ ASSET_TYPE.SPHERICAL_HARMONICS ] )
 	end
+end
+
+function util.get_bricks_left()
+	local count = 0
+
+	for i, v in ipairs( gameobjects_list ) do
+		if v.type == ASSET_TYPE.BRICK or v.type == ASSET_TYPE.BRICK_SILVER then
+			count = count + 1
+		end
+	end
+
+	return count
 end
 
 return util
