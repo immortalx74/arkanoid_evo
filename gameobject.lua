@@ -178,7 +178,7 @@ function gameobject:draw( pass )
 		pass:setColor( self.color )
 	end
 
-	if self.type == ASSET_TYPE.PADDLE_SPINNER then
+	if self.type == ASSET_TYPE.PADDLE_SPINNER or self.type == ASSET_TYPE.PADDLE_SPINNER_BIG then
 		self.model:animate( 1, lovr.timer.getTime() )
 	elseif self.type == ASSET_TYPE.ENEMY_BALOONS or self.type == ASSET_TYPE.ENEMY_CONE or self.type == ASSET_TYPE.ENEMY_PYRAMID then
 		self.model:animate( 1, lovr.timer.getTime() )

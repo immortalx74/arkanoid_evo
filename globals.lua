@@ -7,6 +7,8 @@
 -- "owned" powerup shouldn't change when catching life powerup
 -- prevent ball "extreme" reflection angles from paddle (favor Z direction)
 -- The "disruption" powerup prevents other powerups to spawn, but when there's only one ball left it should return to normal
+-- Implement "Break" and "Slow" powerups
+-- Draw wandering enemies
 
 package.loaded[ ... ] = "globals"
 
@@ -146,7 +148,7 @@ levels = {}
 room_colliders = {}
 player = { contacted = false, hand = "right", paddle_cooldown_timer = timer( false ), laser_cooldown_timer = timer( false ), lives = 3 }
 level_intro_timer = timer( false )
-cur_level = 1
+cur_level = 3
 
 world = lovr.physics.newWorld( {
 	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile" },
