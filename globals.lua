@@ -1,9 +1,8 @@
 -- TODO:
 -- When exit gate is open you CAN collect any other powerup (and transform paddle too)
 -- max lives = 6
--- collecting "life" powerup turns paddle to normal (also deactivates "catch" powerup)
+-- collecting "life" powerup turns paddle to normal (also deactivates "catch" powerup and ball should be released)
 -- silver bricks start with strength = 2, increasing by 1 every 8 stages
--- set playfield origin slightly forward (also let powerups travel a bit further on negative Z axis)
 -- "owned" powerup shouldn't change when catching life powerup
 -- prevent ball "extreme" reflection angles from paddle (favor Z direction)
 -- The "disruption" powerup prevents other powerups to spawn, but when there's only one ball left it should return to normal
@@ -96,7 +95,8 @@ BRICK_COLORS = {
 METRICS = {
 	ROOM_WIDTH = 2.2,
 	ROOM_HEIGHT = 2.2,
-	ROOM_DEPTH = 4,
+	ROOM_DEPTH = 5,
+	ROOM_OFFSET_Z = 1,
 
 	BRICK_WIDTH = 0.162,
 	BRICK_HEIGHT = 0.084,

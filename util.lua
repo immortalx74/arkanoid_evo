@@ -61,29 +61,31 @@ function util.setup_room_colliders( collider )
 	local thickness = 0.5
 	local half_thickness = METRICS.WALL_THICKNESS / 2
 
-	local right = world:newBoxCollider( (METRICS.ROOM_WIDTH / 2) + half_thickness, (METRICS.ROOM_HEIGHT / 2), -METRICS.ROOM_DEPTH / 2, METRICS.ROOM_DEPTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
+	local right = world:newBoxCollider( (METRICS.ROOM_WIDTH / 2) + half_thickness, (METRICS.ROOM_HEIGHT / 2), (-METRICS.ROOM_DEPTH / 2) + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_DEPTH, METRICS.ROOM_HEIGHT,
+		METRICS.WALL_THICKNESS )
 	right:setOrientation( math.pi / 2, 0, 1, 0 )
 	right:setTag( "wall_right" )
 
-	local left = world:newBoxCollider( -(METRICS.ROOM_WIDTH / 2) - half_thickness, (METRICS.ROOM_HEIGHT / 2), -METRICS.ROOM_DEPTH / 2, METRICS.ROOM_DEPTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
+	local left = world:newBoxCollider( -(METRICS.ROOM_WIDTH / 2) - half_thickness, (METRICS.ROOM_HEIGHT / 2), (-METRICS.ROOM_DEPTH / 2) + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_DEPTH, METRICS.ROOM_HEIGHT,
+		METRICS.WALL_THICKNESS )
 	left:setOrientation( -math.pi / 2, 0, 1, 0 )
 	left:setTag( "wall_left" )
 
-	local top = world:newBoxCollider( 0, METRICS.ROOM_HEIGHT + half_thickness, -METRICS.ROOM_DEPTH / 2, METRICS.ROOM_DEPTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
+	local top = world:newBoxCollider( 0, METRICS.ROOM_HEIGHT + half_thickness, (-METRICS.ROOM_DEPTH / 2) + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_DEPTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
 	local m = mat4():rotate( math.pi / 2, 0, 1, 0 ):rotate( math.pi / 2, 1, 0, 0 )
 	top:setOrientation( quat( m ) )
 	top:setTag( "wall_top" )
 
-	local bottom = world:newBoxCollider( 0, -half_thickness, -METRICS.ROOM_DEPTH / 2, METRICS.ROOM_DEPTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
+	local bottom = world:newBoxCollider( 0, -half_thickness, (-METRICS.ROOM_DEPTH / 2) + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_DEPTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
 	local m = mat4():rotate( math.pi / 2, 0, 1, 0 ):rotate( -math.pi / 2, 1, 0, 0 )
 	bottom:setOrientation( quat( m ) )
 	bottom:setTag( "wall_bottom" )
 
 	-- NOTE: Moved closer for testing
-	local back = world:newBoxCollider( 0, (METRICS.ROOM_HEIGHT / 2), -METRICS.ROOM_DEPTH - half_thickness, METRICS.ROOM_WIDTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
+	local back = world:newBoxCollider( 0, (METRICS.ROOM_HEIGHT / 2), (-METRICS.ROOM_DEPTH - half_thickness) + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_WIDTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
 	back:setTag( "wall_far" )
 
-	local front = world:newBoxCollider( 0, (METRICS.ROOM_HEIGHT / 2), half_thickness, METRICS.ROOM_WIDTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
+	local front = world:newBoxCollider( 0, (METRICS.ROOM_HEIGHT / 2), half_thickness + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_WIDTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
 	front:setTag( "wall_near" )
 
 	table.insert( room_colliders, right )

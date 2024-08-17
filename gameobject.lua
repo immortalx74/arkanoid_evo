@@ -126,7 +126,7 @@ function gameobject:update( dt )
 			end
 		end
 	elseif self.type >= ASSET_TYPE.POWERUP_B and self.type <= ASSET_TYPE.POWERUP_S then
-		if vec3( self.pose ).z < 0 then
+		if vec3( self.pose ).z < METRICS.ROOM_OFFSET_Z then
 			local hit = collision.ball_to_powerup( self )
 			if hit then
 				local o = self.collider:getUserData()
