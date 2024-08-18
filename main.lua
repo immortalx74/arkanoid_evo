@@ -14,6 +14,10 @@ end
 function lovr.update( dt )
 	if game_state == GAME_STATE.INIT then
 		util.create_start_screen()
+	elseif game_state == GAME_STATE.EXIT_GATE then
+		if not assets[ ASSET_TYPE.SND_ESCAPE_LEVEL ]:isPlaying() then
+			game_state = GAME_STATE.GENERATE_LEVEL
+		end
 	elseif game_state == GAME_STATE.START_SCREEN then
 		if lovr.headset.wasPressed( "left", "trigger" ) then
 			util.create_mothership_intro( "left" )
@@ -98,7 +102,10 @@ function lovr.update( dt )
 	end
 
 	util.move_starfield( dt )
-	gameobject.update_all( dt )
+
+	if game_state ~= GAME_STATE.EXIT_GATE then
+		gameobject.update_all( dt )
+	end
 end
 
 function lovr.draw( pass )
@@ -138,6 +145,7 @@ function lovr.draw( pass )
 		end
 	elseif game_state == GAME_STATE.PLAY then
 		-- phywire.draw( pass, world )
+		-- phywire.xray( pass, world )
 	elseif game_state == GAME_STATE.LEVEL_INTRO then
 		pass:setShader()
 		pass:text( "ROUND 1", vec3( 0, 1.2, -2 ), METRICS.TEXT_SCALE_BIG )

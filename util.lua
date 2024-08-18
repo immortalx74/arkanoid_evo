@@ -118,6 +118,9 @@ end
 
 function util.generate_level()
 	gameobject.destroy_all()
+	util.create_wanderers()
+	powerup.owned = nil
+	powerup.falling = nil
 
 	local left = -(METRICS.ROOM_WIDTH / 2) + METRICS.GAP_LEFT + (METRICS.BRICK_WIDTH / 2)
 	local top = METRICS.ROOM_HEIGHT - METRICS.GAP_TOP + (METRICS.BRICK_HEIGHT / 2)
@@ -141,8 +144,10 @@ function util.generate_level()
 	end
 
 	util.spawn_paddle( ASSET_TYPE.PADDLE )
+	obj_feet = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.FEET_MARK, METRICS.TRANSPARENCY_IDX_FEET_MARK )
 	obj_room = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM )
 	obj_room_glass = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM_GLASS, METRICS.TRANSPARENCY_IDX_ROOM_GLASS )
+
 	player.paddle_cooldown_timer:start()
 	player.laser_cooldown_timer:start()
 	powerup.timer:start()
@@ -231,6 +236,42 @@ function util.get_bricks_left()
 	end
 
 	return count
+end
+
+function util.set_ball_speed( speed )
+	local ball = nil
+	for i, v in ipairs( gameobjects_list ) do
+		if v.type == ASSET_TYPE.BALL then
+			v.velocity = speed / METRICS.SUBSTEPS
+			break
+		end
+	end
+end
+
+function util.create_wanderers()
+	local rx, ry, rz = math.random( -15, -10 ), math.random( -10, -4 ), math.random( -15, -10 )
+	local ro = math.random( ASSET_TYPE.ENEMY_BALOONS, ASSET_TYPE.ENEMY_PYRAMID )
+	gameobject( vec3( rx, ry, rz ), ro )
+
+	local rx, ry, rz = math.random( 15, 10 ), math.random( -10, -4 ), math.random( -15, -10 )
+	local ro = math.random( ASSET_TYPE.ENEMY_BALOONS, ASSET_TYPE.ENEMY_PYRAMID )
+	gameobject( vec3( rx, ry, rz ), ro )
+
+	local rx, ry, rz = math.random( -15, -10 ), math.random( 10, 4 ), math.random( -10, -5 )
+	local ro = math.random( ASSET_TYPE.ENEMY_BALOONS, ASSET_TYPE.ENEMY_PYRAMID )
+	gameobject( vec3( rx, ry, rz ), ro )
+
+	local rx, ry, rz = math.random( 15, 10 ), math.random( 10, -4 ), math.random( -10, -5 )
+	local ro = math.random( ASSET_TYPE.ENEMY_BALOONS, ASSET_TYPE.ENEMY_PYRAMID )
+	gameobject( vec3( rx, ry, rz ), ro )
+
+	local rx, ry, rz = math.random( -10, -5 ), math.random( 0, 5 ), math.random( -25, -20 )
+	local ro = math.random( ASSET_TYPE.ENEMY_BALOONS, ASSET_TYPE.ENEMY_PYRAMID )
+	gameobject( vec3( rx, ry, rz ), ro )
+
+	local rx, ry, rz = math.random( 10, 5 ), math.random( 0, 5 ), math.random( -25, -20 )
+	local ro = math.random( ASSET_TYPE.ENEMY_BALOONS, ASSET_TYPE.ENEMY_PYRAMID )
+	gameobject( vec3( rx, ry, rz ), ro )
 end
 
 return util

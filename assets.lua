@@ -13,6 +13,8 @@ function assets.load()
 	assets[ ASSET_TYPE.ENEMY_BALOONS ] = lovr.graphics.newModel( "res/models/enemy_baloons.glb" )
 	assets[ ASSET_TYPE.ENEMY_CONE ] = lovr.graphics.newModel( "res/models/enemy_cone.glb" )
 	assets[ ASSET_TYPE.ENEMY_PYRAMID ] = lovr.graphics.newModel( "res/models/enemy_pyramid.glb" )
+	assets[ ASSET_TYPE.FEET_MARK ] = lovr.graphics.newModel( "res/models/feet_mark.glb" )
+	assets[ ASSET_TYPE.EXIT_GATE ] = lovr.graphics.newModel( "res/models/exit_gate.glb" )
 	assets[ ASSET_TYPE.FONT ] = lovr.graphics.newFont( "res/fonts/PressStart2P-Regular.ttf" )
 
 	assets[ ASSET_TYPE.PADDLE ] = lovr.graphics.newModel( "res/models/paddle.glb" )

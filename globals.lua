@@ -7,7 +7,7 @@
 -- prevent ball "extreme" reflection angles from paddle (favor Z direction)
 -- The "disruption" powerup prevents other powerups to spawn, but when there's only one ball left it should return to normal
 -- Implement "Break" and "Slow" powerups
--- Draw wandering enemies
+-- Draw score, high-score, lives
 
 package.loaded[ ... ] = "globals"
 
@@ -68,7 +68,9 @@ ASSET_TYPE = {
 	SHADER_UNLIT = 47,
 	ENEMY_BALOONS = 48,
 	ENEMY_CONE = 49,
-	ENEMY_PYRAMID = 50
+	ENEMY_PYRAMID = 50,
+	FEET_MARK = 51,
+	EXIT_GATE = 52
 }
 
 GAME_STATE = {
@@ -77,7 +79,8 @@ GAME_STATE = {
 	MOTHERSHIP_INTRO = 3,
 	GENERATE_LEVEL = 4,
 	LEVEL_INTRO = 5,
-	PLAY = 6
+	PLAY = 6,
+	EXIT_GATE = 7
 }
 
 BRICK_COLORS = {
@@ -131,10 +134,16 @@ METRICS = {
 	LASER_COOLDOWN_INTERVAL = 0.12,
 
 	TRANSPARENCY_IDX_ROOM_GLASS = 1,
-	TRANSPARENCY_IDX_PADDLE_TOP = 2,
+	TRANSPARENCY_IDX_FEET_MARK = 2,
+	TRANSPARENCY_IDX_PADDLE_TOP = 3,
 
 	TEXT_SCALE_BIG = 0.06,
-	TEXT_SCALE_SMALL = 0.03
+	TEXT_SCALE_SMALL = 0.03,
+
+	EXIT_GATE_RADIUS = 0.09,
+
+	BALL_SPEED_NORMAL = 2.8,
+	BALL_SPEED_SLOW = 1.8
 }
 
 obj_arkanoid_logo = nil
@@ -151,8 +160,8 @@ level_intro_timer = timer( false )
 cur_level = 3
 
 world = lovr.physics.newWorld( {
-	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile" },
-	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile" },
+	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile", "exit_gate" },
+	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile", "exit_gate" },
 	maxColliders = 512,
 	threadSafe = false,
 	tickRate = 60,
@@ -166,6 +175,10 @@ world:disableCollisionBetween( "ball", "powerup" )
 world:disableCollisionBetween( "projectile", "powerup" )
 world:disableCollisionBetween( "projectile", "ball" )
 world:disableCollisionBetween( "projectile", "paddle" )
+world:disableCollisionBetween( "brick", "exit_gate" )
+world:disableCollisionBetween( "ball", "exit_gate" )
+world:disableCollisionBetween( "projectile", "exit_gate" )
+world:disableCollisionBetween( "powerup", "exit_gate" )
 
 phywire.options.wireframe = true
 phywire.options.overdraw = true
@@ -185,3 +198,4 @@ table.insert( phrases, typewriter( "TRAPPED IN SPACE WARPED", vec3( -0.5, 1.4, -
 table.insert( phrases, typewriter( "BY SOMEONE........", vec3( -0.5, 1.3, -2 ), 0.02, false ) )
 
 starfield = { points = {} }
+wanderers = {}

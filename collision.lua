@@ -3,8 +3,19 @@ local assets = require "assets"
 local util = require "util"
 
 local collision = {}
-function collision.ball_to_powerup( cur_powerup )
+function collision.paddle_to_powerup( cur_powerup )
 	local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( cur_powerup.collider:getShapes()[ 1 ], vec3( cur_powerup.pose ), quat( cur_powerup.pose ), "paddle" )
+	if collider then
+		if collider:getTag() == "paddle" then
+			return true
+		end
+	end
+
+	return false
+end
+
+function collision.paddle_to_exit_gate( cur_exit_gate )
+	local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( cur_exit_gate.collider:getShapes()[ 1 ], vec3( cur_exit_gate.pose ), quat( cur_exit_gate.pose ), "paddle" )
 	if collider then
 		if collider:getTag() == "paddle" then
 			return true

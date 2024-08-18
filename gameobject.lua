@@ -20,7 +20,7 @@ function gameobject:new( pose, type, transparent, color )
 
 	if type == ASSET_TYPE.BALL then
 		obj.stick = false
-		obj.velocity = 2.8 / METRICS.SUBSTEPS
+		obj.velocity = METRICS.BALL_SPEED_NORMAL / METRICS.SUBSTEPS
 		local rand_x = math.random( -20, 20 ) * 0.1
 		local rand_y = math.random( -20, 20 ) * 0.1
 		local rand_y = math.random( -20, 20 ) * 0.1
@@ -80,6 +80,16 @@ function gameobject:new( pose, type, transparent, color )
 		obj.collider:setTag( "projectile" )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
+	elseif type == ASSET_TYPE.EXIT_GATE then
+		-- obj.collider = world:newCylinderCollider( vec3( obj.pose ), METRICS.EXIT_GATE_RADIUS, METRICS.ROOM_HEIGHT )
+		-- obj.collider:getShapes()[ 1 ]:setOffset( 0, METRICS.ROOM_HEIGHT / 2, 0, -math.pi / 2, 1, 0, 0 )
+		obj.collider = world:newCollider( vec3( obj.pose ) )
+		local shape = lovr.physics.newCylinderShape( METRICS.EXIT_GATE_RADIUS, METRICS.ROOM_HEIGHT )
+		shape:setOffset( 0, METRICS.ROOM_HEIGHT / 2, 0, math.pi / 2, 1, 0, 0 )
+		obj.collider:addShape( shape )
+		obj.collider:setTag( "exit_gate" )
+		obj.collider:setUserData( obj )
+		obj.collider:setSensor( true )
 	end
 
 	table.insert( gameobjects_list, obj )
@@ -100,7 +110,7 @@ function gameobject:update( dt )
 			local v_stp = v_src:lerp( v_dst, n )
 			local q_stp = q_src:slerp( q_dst, n )
 
-			-- NOTE: Setting the paddle pose here to go hand-in-hand with ball substeps
+			-- Setting the paddle pose here to go hand-in-hand with ball substeps
 			obj_paddle.pose:set( vec3( v_stp ), quat( q_stp ) )
 			obj_paddle_top.pose:set( vec3( v_stp ), quat( q_stp ) )
 			obj_paddle_spinner.pose:set( vec3( v_stp ), quat( q_stp ) )
@@ -127,7 +137,7 @@ function gameobject:update( dt )
 		end
 	elseif self.type >= ASSET_TYPE.POWERUP_B and self.type <= ASSET_TYPE.POWERUP_S then
 		if vec3( self.pose ).z < METRICS.ROOM_OFFSET_Z then
-			local hit = collision.ball_to_powerup( self )
+			local hit = collision.paddle_to_powerup( self )
 			if hit then
 				local o = self.collider:getUserData()
 				powerup.acquire( o.type )
@@ -164,6 +174,17 @@ function gameobject:update( dt )
 				self:destroy()
 			end
 		end
+	elseif self.type == ASSET_TYPE.EXIT_GATE and game_state == GAME_STATE.PLAY then
+		local hit = collision.paddle_to_exit_gate( self )
+		if hit then
+			local num_levels = #levels
+			if cur_level < num_levels then
+				cur_level = cur_level + 1
+				assets[ ASSET_TYPE.SND_ESCAPE_LEVEL ]:stop()
+				assets[ ASSET_TYPE.SND_ESCAPE_LEVEL ]:play()
+				game_state = GAME_STATE.EXIT_GATE
+			end
+		end
 	end
 end
 
@@ -178,7 +199,7 @@ function gameobject:draw( pass )
 		pass:setColor( self.color )
 	end
 
-	if self.type == ASSET_TYPE.PADDLE_SPINNER or self.type == ASSET_TYPE.PADDLE_SPINNER_BIG then
+	if self.type == ASSET_TYPE.PADDLE_SPINNER or self.type == ASSET_TYPE.PADDLE_SPINNER_BIG or self.type == ASSET_TYPE.EXIT_GATE then
 		self.model:animate( 1, lovr.timer.getTime() )
 	elseif self.type == ASSET_TYPE.ENEMY_BALOONS or self.type == ASSET_TYPE.ENEMY_CONE or self.type == ASSET_TYPE.ENEMY_PYRAMID then
 		self.model:animate( 1, lovr.timer.getTime() )
