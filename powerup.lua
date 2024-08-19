@@ -66,7 +66,8 @@ function powerup.acquire( pu_type )
 			end
 		end
 
-		gameobject( vec3( spawn_x, 0, z ), ASSET_TYPE.EXIT_GATE )
+		gameobject( vec3( spawn_x, 0, z ), ASSET_TYPE.EXIT_GATE, METRICS.TRANSPARENCY_IDX_EXIT_GATE )
+		gameobject( vec3( spawn_x, 0, z ), ASSET_TYPE.EXIT_GATE_COLUMN, METRICS.TRANSPARENCY_IDX_EXIT_GATE_COLUMN )
 	elseif pu_type == ASSET_TYPE.POWERUP_D then
 		util.spawn_paddle( ASSET_TYPE.PADDLE )
 		gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.BALL )
