@@ -58,7 +58,6 @@ function util.get_hit_face( nx, ny, nz )
 end
 
 function util.setup_room_colliders( collider )
-	local thickness = 0.5
 	local half_thickness = METRICS.WALL_THICKNESS / 2
 
 	local right = world:newBoxCollider( (METRICS.ROOM_WIDTH / 2) + half_thickness, (METRICS.ROOM_HEIGHT / 2), (-METRICS.ROOM_DEPTH / 2) + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_DEPTH, METRICS.ROOM_HEIGHT,
@@ -132,7 +131,7 @@ function util.generate_level()
 			elseif v == "$" then
 				gameobject( vec3( left, top, -METRICS.BRICK_DIST_Z ), ASSET_TYPE.BRICK_GOLD )
 			else
-				gameobject( vec3( left, top, -METRICS.BRICK_DIST_Z ), ASSET_TYPE.BRICK, false, BRICK_COLORS[ v ] )
+				gameobject( vec3( left, top, -METRICS.BRICK_DIST_Z ), ASSET_TYPE.BRICK, false, BRICK_COLORS[ v ], BRICK_POINTS[ v ] )
 			end
 		end
 
@@ -272,6 +271,33 @@ function util.create_wanderers()
 	local rx, ry, rz = math.random( 10, 5 ), math.random( 0, 5 ), math.random( -25, -20 )
 	local ro = math.random( ASSET_TYPE.ENEMY_BALOONS, ASSET_TYPE.ENEMY_PYRAMID )
 	gameobject( vec3( rx, ry, rz ), ro )
+end
+
+function util.draw_score( pass )
+	pass:setShader()
+	pass:setColor( 1, 0, 0 )
+	if player.flashing_timer:get_elapsed() > 0.5 and player.flashing_timer:get_elapsed() < 1 then
+		pass:text( "1UP", vec3( -0.9, 3, -5 ), 0.1 )
+	end
+
+	if player.flashing_timer:get_elapsed() > 1 then
+		player.flashing_timer:start()
+	end
+
+	pass:text( "HIGH SCORE", vec3( 0, 3, -5 ), 0.1 )
+
+	pass:setColor( 1, 1, 1 )
+	pass:text( player.score, vec3( -0.9, 2.9, -5 ), 0.1 )
+	pass:text( player.high_score, vec3( 0, 2.9, -5 ), 0.1 )
+
+	pass:setMaterial( assets[ ASSET_TYPE.LIFE_ICON ] )
+
+	local x = -0.9
+	for i = 1, player.lives - 1 do
+		pass:plane( vec3( x, 2.7, -5 ), vec2( 0.2, 0.1 ) )
+		x = x + 0.2
+	end
+	pass:setMaterial()
 end
 
 return util

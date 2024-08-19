@@ -6,6 +6,7 @@ local powerup = require "powerup"
 local typewriter = require "typewriter"
 
 function lovr.load()
+	lovr.filesystem.mount( "res", "res" )
 	assets.load()
 	assets.load_levels()
 	util.create_starfield()
@@ -58,6 +59,7 @@ function lovr.update( dt )
 	elseif game_state == GAME_STATE.LEVEL_INTRO then
 		if level_intro_timer:get_elapsed() > 3 then
 			local ball = gameobject( vec3( -0.8, 1.6, -1 ), ASSET_TYPE.BALL )
+			player.flashing_timer:start()
 			game_state = GAME_STATE.PLAY
 		end
 	elseif game_state == GAME_STATE.PLAY then
@@ -102,6 +104,9 @@ function lovr.update( dt )
 	end
 
 	util.move_starfield( dt )
+	if player.score > player.high_score then
+		player.high_score = player.score
+	end
 
 	if game_state ~= GAME_STATE.EXIT_GATE then
 		gameobject.update_all( dt )
@@ -146,6 +151,7 @@ function lovr.draw( pass )
 	elseif game_state == GAME_STATE.PLAY then
 		-- phywire.draw( pass, world )
 		-- phywire.xray( pass, world )
+		util.draw_score( pass )
 	elseif game_state == GAME_STATE.LEVEL_INTRO then
 		pass:setShader()
 		pass:text( "ROUND 1", vec3( 0, 1.2, -2 ), METRICS.TEXT_SCALE_BIG )

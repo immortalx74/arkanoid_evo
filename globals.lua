@@ -69,7 +69,8 @@ ASSET_TYPE = {
 	ENEMY_CONE = 49,
 	ENEMY_PYRAMID = 50,
 	FEET_MARK = 51,
-	EXIT_GATE = 52
+	EXIT_GATE = 52,
+	LIFE_ICON = 53
 }
 
 GAME_STATE = {
@@ -91,6 +92,18 @@ BRICK_COLORS = {
 	[ "b" ] = { 0, 0.44, 1 },
 	[ "p" ] = { 1, 0, 1 },
 	[ "y" ] = { 1, 1, 0 },
+
+}
+
+BRICK_POINTS = {
+	[ "w" ] = 50,
+	[ "o" ] = 60,
+	[ "c" ] = 70,
+	[ "g" ] = 80,
+	[ "r" ] = 90,
+	[ "b" ] = 100,
+	[ "p" ] = 110,
+	[ "y" ] = 120,
 
 }
 
@@ -154,9 +167,9 @@ gameobjects_list = {}
 game_state = GAME_STATE.INIT
 levels = {}
 room_colliders = {}
-player = { contacted = false, hand = "right", paddle_cooldown_timer = timer( false ), laser_cooldown_timer = timer( false ), lives = 3 }
+player = { contacted = false, hand = "right", paddle_cooldown_timer = timer( false ), laser_cooldown_timer = timer( false ), lives = 3, score = 0, high_score = 50000, flashing_timer = timer( false ) }
 level_intro_timer = timer( false )
-cur_level = 3
+cur_level = 1
 
 world = lovr.physics.newWorld( {
 	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile", "exit_gate" },

@@ -45,6 +45,10 @@ function collision.ball_to_brick( cur_ball )
 					o:destroy()
 					assets[ ASSET_TYPE.SND_BALL_BRICK_DESTROY ]:stop()
 					assets[ ASSET_TYPE.SND_BALL_BRICK_DESTROY ]:play()
+
+					if o.type == ASSET_TYPE.BRICK then -- add to score
+						player.score = player.score + o.points
+					end
 				else
 					assets[ ASSET_TYPE.SND_BALL_BRICK_DING ]:stop()
 					assets[ ASSET_TYPE.SND_BALL_BRICK_DING ]:play()

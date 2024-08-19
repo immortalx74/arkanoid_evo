@@ -8,7 +8,7 @@ local assets = require "assets"
 local powerup = require "powerup"
 local collision = require "collision"
 
-function gameobject:new( pose, type, transparent, color )
+function gameobject:new( pose, type, transparent, color, points )
 	local obj = {}
 	setmetatable( obj, { __index = self } )
 
@@ -37,6 +37,7 @@ function gameobject:new( pose, type, transparent, color )
 		obj.collider:setSensor( true )
 		if type == ASSET_TYPE.BRICK then
 			obj.strength = 1
+			obj.points = points
 		elseif type == ASSET_TYPE.BRICK_SILVER then
 			obj.strength = 2
 		else
@@ -162,7 +163,8 @@ function gameobject:update( dt )
 			end
 
 			if brick.strength == 0 then
-				if brick.type == ASSET_TYPE.BRICK then -- Only colored bricks can spawn powerups
+				if brick.type == ASSET_TYPE.BRICK then -- Only colored bricks can spawn powerups and give points
+					player.score = player.score + brick.points
 					powerup.spawn( brick.pose )
 				end
 				brick:destroy()
@@ -252,8 +254,8 @@ function gameobject.draw_all( pass )
 end
 
 setmetatable( gameobject, {
-	__call = function( self, position, type, transparent, color )
-		return self:new( position, type, transparent, color )
+	__call = function( self, position, type, transparent, color, points )
+		return self:new( position, type, transparent, color, points )
 	end
 } )
 
