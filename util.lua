@@ -313,4 +313,15 @@ function util.release_sticky_ball()
 	ball.direction:normalize()
 end
 
+function util.get_num_balls()
+	local count = 0
+	for i, v in ipairs( gameobjects_list ) do
+		if v.type == ASSET_TYPE.BALL then
+			count = count + 1
+		end
+	end
+	
+	return count
+end
+
 return util

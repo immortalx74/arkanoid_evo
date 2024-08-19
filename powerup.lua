@@ -11,7 +11,8 @@ powerup.owned = nil
 powerup.interval = 6
 
 function powerup.spawn( brick_pose )
-	if powerup.timer:get_elapsed() > powerup.interval and powerup.owned ~= ASSET_TYPE.POWERUP_D then
+	local num_balls = util.get_num_balls()
+	if powerup.timer:get_elapsed() > powerup.interval and num_balls == 1 then -- (multiple balls means we own POWERUP_D, so prevent spawning)
 		local random_powerup = nil
 		while true do
 			random_powerup = math.random( ASSET_TYPE.POWERUP_B, ASSET_TYPE.POWERUP_S )

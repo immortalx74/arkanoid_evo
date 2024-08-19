@@ -3,7 +3,6 @@
 -- silver bricks start with strength = 2, increasing by 1 every 8 stages (a bit hard for VR though)
 -- "owned" powerup shouldn't change when catching life powerup
 -- prevent ball "extreme" reflection angles from paddle (favor Z direction)
--- The "disruption" powerup prevents other powerups to spawn, but when there's only one ball left it should return to normal
 -- Consider making back of room a window instead of completely empty space
 
 package.loaded[ ... ] = "globals"
