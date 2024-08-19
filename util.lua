@@ -300,4 +300,17 @@ function util.draw_score( pass )
 	pass:setMaterial()
 end
 
+function util.release_sticky_ball()
+	player.sticky_ball:destroy()
+	player.sticky_ball = nil
+	local m = mat4( obj_paddle.pose ):rotate( -math.pi / 2, 1, 0, 0 )
+	local angle, ax, ay, az = m:getOrientation()
+	local q = quat( angle, ax, ay, az )
+	local v = vec3( q )
+	m:translate( 0, 0, -0.04 )
+	local ball = gameobject( vec3( m ), ASSET_TYPE.BALL )
+	ball.direction:set( v )
+	ball.direction:normalize()
+end
+
 return util

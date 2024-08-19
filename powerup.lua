@@ -15,7 +15,9 @@ function powerup.spawn( brick_pose )
 		local random_powerup = nil
 		while true do
 			random_powerup = math.random( ASSET_TYPE.POWERUP_B, ASSET_TYPE.POWERUP_S )
-			if random_powerup ~= powerup.falling and random_powerup ~= powerup.owned then break end
+			if random_powerup ~= powerup.falling and random_powerup ~= powerup.owned then
+				break
+			end
 		end
 
 		-- Spawn near the front of the brick
@@ -30,6 +32,10 @@ end
 function powerup.acquire( pu_type )
 	local prev_owned = powerup.owned
 	powerup.owned = pu_type
+
+	if player.sticky_ball then
+		util.release_sticky_ball()
+	end
 
 	if prev_owned == ASSET_TYPE.POWERUP_S and powerup.owned ~= ASSET_TYPE.POWERUP_S then
 		util.set_ball_speed( METRICS.BALL_SPEED_NORMAL )

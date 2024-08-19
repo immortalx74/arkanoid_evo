@@ -1,13 +1,10 @@
 -- TODO:
 -- When exit gate is open you CAN collect any other powerup (and transform paddle too)
--- max lives = 6
--- collecting "life" powerup turns paddle to normal (also deactivates "catch" powerup and ball should be released)
--- silver bricks start with strength = 2, increasing by 1 every 8 stages
+-- silver bricks start with strength = 2, increasing by 1 every 8 stages (a bit hard for VR though)
 -- "owned" powerup shouldn't change when catching life powerup
 -- prevent ball "extreme" reflection angles from paddle (favor Z direction)
 -- The "disruption" powerup prevents other powerups to spawn, but when there's only one ball left it should return to normal
--- Draw score, high-score, lives
--- Do not allow owned powerup to be spawned again (broken)
+-- Consider making back of room a window instead of completely empty space
 
 package.loaded[ ... ] = "globals"
 
