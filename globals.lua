@@ -6,11 +6,10 @@
 -- "owned" powerup shouldn't change when catching life powerup
 -- prevent ball "extreme" reflection angles from paddle (favor Z direction)
 -- The "disruption" powerup prevents other powerups to spawn, but when there's only one ball left it should return to normal
--- Implement "Break" and "Slow" powerups
 -- Draw score, high-score, lives
+-- Do not allow owned powerup to be spawned again (broken)
 
 package.loaded[ ... ] = "globals"
-
 
 local timer = require "timer"
 local util = require "util"
