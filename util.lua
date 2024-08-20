@@ -320,7 +320,7 @@ function util.get_num_balls()
 			count = count + 1
 		end
 	end
-	
+
 	return count
 end
 

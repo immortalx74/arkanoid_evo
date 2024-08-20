@@ -98,7 +98,7 @@ function collision.ball_to_paddle( cur_ball )
 	if player.contacted then
 		if player.paddle_cooldown_timer:get_elapsed() >= METRICS.PADDLE_COOLDOWN_INTERVAL then
 			player.contacted = false
-			player.paddle_cooldown_timer:start()
+			player.paddle_cooldown_timer:stop()
 		end
 	else
 		local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( cur_ball.collider:getShapes()[ 1 ], vec3( cur_ball.pose ), quat( cur_ball.pose ), "paddle" )
@@ -119,6 +119,7 @@ function collision.ball_to_paddle( cur_ball )
 				player.contacted = true
 				assets[ ASSET_TYPE.SND_BALL_TO_PADDLE ]:stop()
 				assets[ ASSET_TYPE.SND_BALL_TO_PADDLE ]:play()
+				player.paddle_cooldown_timer:start()
 				return true
 			end
 		end

@@ -22,10 +22,8 @@ function lovr.update( dt )
 	elseif game_state == GAME_STATE.START_SCREEN then
 		if lovr.headset.wasPressed( "left", "trigger" ) then
 			util.create_mothership_intro( "left" )
-			game_state = GAME_STATE.MOTHERSHIP_INTRO
 		elseif lovr.headset.wasPressed( "right", "trigger" ) then
 			util.create_mothership_intro( "right" )
-			game_state = GAME_STATE.MOTHERSHIP_INTRO
 		end
 	elseif game_state == GAME_STATE.MOTHERSHIP_INTRO then
 		if lovr.headset.wasPressed( player.hand, "trigger" ) then
@@ -45,6 +43,7 @@ function lovr.update( dt )
 		end
 
 		if phrases.idx == 9 and phrases.last_timer:get_elapsed() > 7 then
+			enemy_ship_timer:stop()
 			game_state = GAME_STATE.GENERATE_LEVEL
 		elseif phrases.idx == 9 and phrases.last_timer:get_elapsed() > 4 and not assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:isPlaying() then
 			assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:play()

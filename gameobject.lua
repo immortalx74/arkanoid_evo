@@ -185,6 +185,8 @@ function gameobject:update( dt )
 				assets[ ASSET_TYPE.SND_ESCAPE_LEVEL ]:stop()
 				assets[ ASSET_TYPE.SND_ESCAPE_LEVEL ]:play()
 				game_state = GAME_STATE.EXIT_GATE
+			else
+				-- NOTE: Escape to Doh level
 			end
 		end
 	end
