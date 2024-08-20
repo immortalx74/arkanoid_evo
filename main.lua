@@ -90,6 +90,8 @@ function lovr.update( dt )
 			if cur_level < num_levels then
 				cur_level = cur_level + 1
 				game_state = GAME_STATE.GENERATE_LEVEL
+			else
+				-- NOTE Do Doh level here
 			end
 		end
 	end
@@ -145,7 +147,7 @@ function lovr.draw( pass )
 		util.draw_score( pass )
 	elseif game_state == GAME_STATE.LEVEL_INTRO then
 		pass:setShader()
-		pass:text( "ROUND 1", vec3( 0, 1.2, -2 ), METRICS.TEXT_SCALE_BIG )
+		pass:text( "ROUND " .. cur_level, vec3( 0, 1.2, -2 ), METRICS.TEXT_SCALE_BIG )
 		if level_intro_timer:get_elapsed() > 1 then
 			pass:text( "START", vec3( 0, 1.1, -2 ), METRICS.TEXT_SCALE_BIG )
 		end
