@@ -33,7 +33,19 @@ function lovr.update( dt )
 
 		if phrases[ phrases.idx ]:has_finished() then
 			if phrases.idx < #phrases then
-				phrases.idx = phrases.idx + 1
+				if phrases.idx == 2 or phrases.idx == 6 then
+					if not phrases.between_timer.started then
+						phrases.between_timer:start()
+					end
+				else
+					phrases.idx = phrases.idx + 1
+				end
+
+				if phrases.between_timer:get_elapsed() > 0.5 then
+					phrases.between_timer:stop()
+					phrases.idx = phrases.idx + 1
+				end
+
 				phrases[ phrases.idx ]:start()
 			else
 				if not phrases.last_timer.started then
@@ -42,10 +54,10 @@ function lovr.update( dt )
 			end
 		end
 
-		if phrases.idx == 9 and phrases.last_timer:get_elapsed() > 7 then
+		if phrases.idx == 9 and phrases.last_timer:get_elapsed() > 5 then
 			enemy_ship_timer:stop()
 			game_state = GAME_STATE.GENERATE_LEVEL
-		elseif phrases.idx == 9 and phrases.last_timer:get_elapsed() > 4 and not assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:isPlaying() then
+		elseif phrases.idx == 9 and phrases.last_timer:get_elapsed() > 2 and not assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:isPlaying() then
 			assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:play()
 			enemy_ship_timer:stop()
 		end

@@ -196,7 +196,7 @@ phywire.options.wireframe = true
 phywire.options.overdraw = true
 math.randomseed( os.time() )
 
-phrases = { idx = 1, last_timer = timer( false ) }
+phrases = { idx = 1, last_timer = timer( false ), between_timer = timer( false ) }
 table.insert( phrases, typewriter( "THE ERA AND TIME OF", vec3( -0.5, 1.5, -2 ), 0.02, true ) )
 table.insert( phrases, typewriter( "THIS STORY IS UNKNOWN.", vec3( -0.5, 1.4, -2 ), 0.02, false ) )
 
