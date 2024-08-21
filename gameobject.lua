@@ -214,6 +214,9 @@ function gameobject:draw( pass )
 		for i = 1, count do
 			self.model:animate( i, lovr.timer.getTime() )
 		end
+	elseif self.type == ASSET_TYPE.BALL then
+		local v = vec3( self.pose )
+		pass:circle( v.x, 0, v.z, 0.03, -math.pi / 2, 1, 0, 0 )
 	end
 
 	pass:draw( self.model, self.pose )

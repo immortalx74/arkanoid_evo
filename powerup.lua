@@ -14,8 +14,12 @@ function powerup.spawn( brick_pose )
 	local num_balls = util.get_num_balls()
 	if powerup.timer:get_elapsed() > powerup.interval and num_balls == 1 then -- (multiple balls means we own POWERUP_D, so prevent spawning)
 		local random_powerup = nil
+		local first = ASSET_TYPE.POWERUP_B
+		if player.gate_open then
+			first = ASSET_TYPE.POWERUP_C -- prevent a 2nd "B" powerup
+		end
 		while true do
-			random_powerup = math.random( ASSET_TYPE.POWERUP_B, ASSET_TYPE.POWERUP_S )
+			random_powerup = math.random( first, ASSET_TYPE.POWERUP_S )
 			if random_powerup ~= powerup.falling and random_powerup ~= powerup.owned then
 				break
 			end
@@ -73,6 +77,7 @@ function powerup.acquire( pu_type )
 			end
 		end
 
+		player.gate_open = true
 		gameobject( vec3( spawn_x, 0, z ), ASSET_TYPE.EXIT_GATE, METRICS.TRANSPARENCY_IDX_EXIT_GATE )
 		gameobject( vec3( spawn_x, 0, z ), ASSET_TYPE.EXIT_GATE_COLUMN, METRICS.TRANSPARENCY_IDX_EXIT_GATE_COLUMN )
 	elseif pu_type == ASSET_TYPE.POWERUP_D then

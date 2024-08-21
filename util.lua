@@ -146,7 +146,7 @@ function util.generate_level()
 	obj_feet = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.FEET_MARK, METRICS.TRANSPARENCY_IDX_FEET_MARK )
 	obj_room = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM )
 	obj_room_glass = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM_GLASS, METRICS.TRANSPARENCY_IDX_ROOM_GLASS )
-
+	-- gameobject( vec3( 0, 1, -3.5 ), ASSET_TYPE.DOH )
 	player.paddle_cooldown_timer:start()
 	player.laser_cooldown_timer:start()
 	powerup.timer:start()

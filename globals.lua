@@ -167,7 +167,7 @@ gameobjects_list = {}
 game_state = GAME_STATE.INIT
 levels = {}
 room_colliders = {}
-player = { contacted = false, hand = "right", paddle_cooldown_timer = timer( false ), laser_cooldown_timer = timer( false ), lives = 3, score = 0, high_score = 50000, flashing_timer = timer( false ) }
+player = { contacted = false, hand = "right", paddle_cooldown_timer = timer( false ), laser_cooldown_timer = timer( false ), lives = 3, score = 0, high_score = 50000, flashing_timer = timer( false ), gate_open = false }
 level_intro_timer = timer( false )
 cur_level = 1
 
