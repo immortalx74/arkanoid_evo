@@ -68,7 +68,8 @@ ASSET_TYPE = {
 	EXIT_GATE = 52,
 	LIFE_ICON = 53,
 	EXIT_GATE_COLUMN = 54,
-	DOH = 55
+	DOH = 55,
+	DOH_COLLISION = 56,
 }
 
 GAME_STATE = {
@@ -78,7 +79,8 @@ GAME_STATE = {
 	GENERATE_LEVEL = 4,
 	LEVEL_INTRO = 5,
 	PLAY = 6,
-	EXIT_GATE = 7
+	EXIT_GATE = 7,
+	DEFEAT_DOH = 8
 }
 
 BRICK_COLORS = {
@@ -155,7 +157,9 @@ METRICS = {
 	EXIT_GATE_RADIUS = 0.09,
 
 	BALL_SPEED_NORMAL = 2.8,
-	BALL_SPEED_SLOW = 1.8
+	BALL_SPEED_SLOW = 1.8,
+
+	DOH_STRENGTH = 4
 }
 
 obj_arkanoid_logo = nil
@@ -167,13 +171,26 @@ gameobjects_list = {}
 game_state = GAME_STATE.INIT
 levels = {}
 room_colliders = {}
-player = { contacted = false, hand = "right", paddle_cooldown_timer = timer( false ), laser_cooldown_timer = timer( false ), lives = 3, score = 0, high_score = 50000, flashing_timer = timer( false ), gate_open = false }
+player = {
+	contacted = false,
+	hand = "right",
+	paddle_cooldown_timer = timer( false ),
+	laser_cooldown_timer = timer( false ),
+	lives = 3,
+	score = 0,
+	high_score = 50000,
+	flashing_timer = timer( false ),
+	gate_open = false,
+	doh_hit_timer =
+		timer( true ),
+	doh_hits = 0
+}
 level_intro_timer = timer( false )
-cur_level = 1
+cur_level = 32
 
 world = lovr.physics.newWorld( {
-	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile", "exit_gate" },
-	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile", "exit_gate" },
+	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile", "exit_gate", "doh" },
+	staticTags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile", "exit_gate", "doh" },
 	maxColliders = 512,
 	threadSafe = false,
 	tickRate = 60,

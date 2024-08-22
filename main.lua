@@ -8,6 +8,7 @@ local typewriter = require "typewriter"
 function lovr.load()
 	lovr.filesystem.mount( "res", "res" )
 	assets.load()
+	doh_v, doh_i, doh_d = util.get_model_normals( assets[ ASSET_TYPE.DOH_COLLISION ] )
 	assets.load_levels()
 	util.create_starfield()
 end
@@ -105,6 +106,10 @@ function lovr.update( dt )
 				-- NOTE Do Doh level here
 			end
 		end
+
+		if player.doh_hits >= METRICS.DOH_STRENGTH then
+			game_state = GAME_STATE.DEFEAT_DOH
+		end
 	end
 
 	util.move_starfield( dt )
@@ -112,7 +117,7 @@ function lovr.update( dt )
 		player.high_score = player.score
 	end
 
-	if game_state ~= GAME_STATE.EXIT_GATE then
+	if game_state ~= GAME_STATE.EXIT_GATE and game_state ~= GAME_STATE.DEFEAT_DOH then
 		gameobject.update_all( dt )
 	end
 end

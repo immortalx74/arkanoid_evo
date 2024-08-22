@@ -80,7 +80,6 @@ function util.setup_room_colliders( collider )
 	bottom:setOrientation( quat( m ) )
 	bottom:setTag( "wall_bottom" )
 
-	-- NOTE: Moved closer for testing
 	local back = world:newBoxCollider( 0, (METRICS.ROOM_HEIGHT / 2), (-METRICS.ROOM_DEPTH - half_thickness) + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_WIDTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
 	back:setTag( "wall_far" )
 
@@ -146,9 +145,15 @@ function util.generate_level()
 	obj_feet = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.FEET_MARK, METRICS.TRANSPARENCY_IDX_FEET_MARK )
 	obj_room = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM )
 	obj_room_glass = gameobject( vec3( 0, 0, 0 ), ASSET_TYPE.ROOM_GLASS, METRICS.TRANSPARENCY_IDX_ROOM_GLASS )
-	-- gameobject( vec3( 0, 1, -3.5 ), ASSET_TYPE.DOH )
+
+	if cur_level == 33 then
+		gameobject( vec3( 0, 0, -METRICS.ROOM_DEPTH + 1 ), ASSET_TYPE.DOH )
+		gameobject( vec3( 0, 0, -METRICS.ROOM_DEPTH + 1 ), ASSET_TYPE.DOH_COLLISION )
+	end
+
 	player.paddle_cooldown_timer:start()
 	player.laser_cooldown_timer:start()
+	player.gate_open = false
 	powerup.timer:start()
 end
 
@@ -322,6 +327,49 @@ function util.get_num_balls()
 	end
 
 	return count
+end
+
+function util.get_model_normals( model )
+	local vertices, indices = model:getTriangles()
+	local directions = {}
+
+	for i = 1, #indices, 3 do
+		local va = vec3( vertices[ indices[ i + 0 ] + 0 ], vertices[ indices[ i + 0 ] + 1 ], vertices[ indices[ i + 0 ] ] + 2 )
+		local vb = vec3( vertices[ indices[ i + 1 ] + 0 ], vertices[ indices[ i + 1 ] + 1 ], vertices[ indices[ i + 1 ] ] + 2 )
+		local vc = vec3( vertices[ indices[ i + 2 ] + 0 ], vertices[ indices[ i + 2 ] + 1 ], vertices[ indices[ i + 2 ] ] + 2 )
+
+		local triangle = vec3( va, vb, vc )
+		local dir = vec3( vb - va )
+		dir:cross( vc - va )
+		dir:normalize()
+		table.insert( directions, { triangle = { lovr.math.newVec3( va ), lovr.math.newVec3( vb ), lovr.math.newVec3( vc ) }, normal = lovr.math.newVec3( dir ) } )
+	end
+
+	return vertices, indices, directions
+end
+
+function util.point_in_triangle( A, B, C, P )
+	local AB = A:sub( B )
+	local AC = A:sub( C )
+	local AP = A:sub( P )
+
+	local ABxAC = AB:cross( AC )
+	local ABxAP = AB:cross( AP )
+	local ACxAP = AC:cross( AP )
+
+	local area_ABC = ABxAC:length()
+	local area_ABP = ABxAP:length()
+	local area_ACP = ACxAP:length()
+
+	local PB = P:sub( B )
+	local PC = P:sub( C )
+	local PBxPC = PB:cross( PC )
+	local area_PBC = PBxPC:length()
+
+	local total_sub_areas = area_ABP + area_ACP + area_PBC
+
+	local tolerance = 1e-6
+	return math.abs( area_ABC - total_sub_areas ) < tolerance
 end
 
 return util

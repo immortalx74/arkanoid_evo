@@ -91,6 +91,13 @@ function gameobject:new( pose, type, transparent, color, points )
 		obj.collider:setTag( "exit_gate" )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
+	elseif type == ASSET_TYPE.DOH_COLLISION then
+		obj.invisible = true
+		obj.collider = world:newMeshCollider( assets[ ASSET_TYPE.DOH_COLLISION ] )
+		obj.collider:setTag( "doh" )
+		obj.collider:setUserData( obj )
+		obj.collider:setSensor( true )
+		obj.collider:getShapes()[ 1 ]:setOffset( vec3( obj.pose ) )
 	end
 
 	table.insert( gameobjects_list, obj )
@@ -128,6 +135,9 @@ function gameobject:update( dt )
 
 			collision.ball_to_brick( self )
 			collision.ball_to_wall( self )
+			if cur_level == 33 then
+				collision.ball_to_doh( self )
+			end
 			local hit = collision.ball_to_paddle( self )
 			if hit then
 				if powerup.owned == ASSET_TYPE.POWERUP_C then
@@ -193,6 +203,8 @@ function gameobject:update( dt )
 end
 
 function gameobject:draw( pass )
+	if self.invisible then return end
+
 	if self.transparent then
 		pass:setShader( assets[ ASSET_TYPE.SHADER_UNLIT ] )
 	else
@@ -203,11 +215,16 @@ function gameobject:draw( pass )
 		pass:setColor( self.color )
 	end
 
-	if self.type == ASSET_TYPE.PADDLE_SPINNER or self.type == ASSET_TYPE.PADDLE_SPINNER_BIG or self.type == ASSET_TYPE.EXIT_GATE then
-		self.model:animate( 1, lovr.timer.getTime() )
-	elseif self.type == ASSET_TYPE.ENEMY_BALOONS or self.type == ASSET_TYPE.ENEMY_CONE or self.type == ASSET_TYPE.ENEMY_PYRAMID then
-		self.model:animate( 1, lovr.timer.getTime() )
-	elseif self.type >= ASSET_TYPE.POWERUP_B and self.type <= ASSET_TYPE.POWERUP_S then
+	local animated_models =
+		self.type == ASSET_TYPE.PADDLE_SPINNER or
+		self.type == ASSET_TYPE.PADDLE_SPINNER_BIG or
+		self.type == ASSET_TYPE.EXIT_GATE or
+		self.type == ASSET_TYPE.ENEMY_BALOONS or
+		self.type == ASSET_TYPE.ENEMY_CONE or
+		self.type == ASSET_TYPE.ENEMY_PYRAMID or
+		self.type >= ASSET_TYPE.POWERUP_B and self.type <= ASSET_TYPE.POWERUP_S
+
+	if animated_models then
 		self.model:animate( 1, lovr.timer.getTime() )
 	elseif self.type == ASSET_TYPE.PADDLE or self.type == ASSET_TYPE.PADDLE_BIG or self.type == ASSET_TYPE.PADDLE_LASER then
 		local count = self.model:getAnimationCount()
@@ -217,6 +234,13 @@ function gameobject:draw( pass )
 	elseif self.type == ASSET_TYPE.BALL then
 		local v = vec3( self.pose )
 		pass:circle( v.x, 0, v.z, 0.03, -math.pi / 2, 1, 0, 0 )
+	elseif self.type == ASSET_TYPE.DOH then
+		-- pass:setColor( 0.5,0,0 )
+		if player.doh_hit_timer:get_elapsed() < 0.1 then
+			pass:setColor( 1, 0, 0 )
+		else
+			pass:setColor( 0.5, 0, 0 )
+		end
 	end
 
 	pass:draw( self.model, self.pose )

@@ -94,6 +94,43 @@ function collision.ball_to_wall( cur_ball )
 	end
 end
 
+function collision.ball_to_doh( cur_ball )
+	local collider, shape, x, y, z, nx, ny, nz = world:overlapShape( cur_ball.collider:getShapes()[ 1 ], vec3( cur_ball.pose ), quat( cur_ball.pose ), "doh" )
+
+	local normal = nil
+
+	if collider then
+		if collider:getTag() == "doh" then
+			for i, v in ipairs( doh_d ) do
+				local A = v.triangle[ 1 ]
+				local B = v.triangle[ 2 ]
+				local C = v.triangle[ 3 ]
+				local point = vec3( x, y, z )
+
+				if util.point_in_triangle( A, B, C, point ) then
+					normal = v.normal
+					break
+				end
+			end
+
+			if normal then
+				cur_ball.pose:translate( -nx, -ny, -nz )
+				-- NOTE: I don't even know why I have to do this!
+				if x > 0 then
+					cur_ball.direction:set( util.reflection_vector( -normal, -cur_ball.direction ) )
+				else
+					cur_ball.direction:set( util.reflection_vector( -normal, cur_ball.direction ) )
+				end
+
+				player.doh_hits = player.doh_hits + 1
+				print( player.doh_hits )
+				player.doh_hit_timer:start()
+				return
+			end
+		end
+	end
+end
+
 function collision.ball_to_paddle( cur_ball )
 	if player.contacted then
 		if player.paddle_cooldown_timer:get_elapsed() >= METRICS.PADDLE_COOLDOWN_INTERVAL then
