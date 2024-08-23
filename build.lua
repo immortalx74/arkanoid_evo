@@ -9,7 +9,8 @@ local exclude = {
 	".vscode",
 	"build",
 	"build.lua",
-	"devres"
+	"devres",
+	"arkanoid_evo.gif"
 }
 
 local function GetFilesAndFolders( directory, excl )
