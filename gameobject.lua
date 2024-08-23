@@ -232,7 +232,7 @@ function gameobject:draw( pass )
 
 	if animated_models then
 		if self.type >= ASSET_TYPE.ENEMY_BALOONS and self.type <= ASSET_TYPE.ENEMY_PYRAMID then
-			if game_state == GAME_STATE.PLAY then
+			if game_state == GAME_STATE.PLAY or game_state == GAME_STATE.LEVEL_INTRO then
 				self.model:animate( 1, lovr.timer.getTime() )
 			end
 		else

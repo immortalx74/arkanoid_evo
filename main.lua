@@ -16,6 +16,11 @@ end
 function lovr.update( dt )
 	if game_state == GAME_STATE.INIT then
 		util.create_start_screen()
+	elseif game_state == GAME_STATE.GAME_OVER then
+		if lovr.headset.wasPressed( player.hand, "trigger" ) then
+			cur_level = 1
+			game_state = GAME_STATE.INIT
+		end
 	elseif game_state == GAME_STATE.LOST_LIFE then
 		if not assets[ ASSET_TYPE.SND_LOST_LIFE ]:isPlaying() then
 			if player.lives == 0 then
@@ -35,10 +40,11 @@ function lovr.update( dt )
 			game_state = GAME_STATE.GENERATE_LEVEL
 		end
 	elseif game_state == GAME_STATE.START_SCREEN then
+		local invincible = lovr.headset.isDown( "left", "x" ) or lovr.headset.isDown( "right", "a" )
 		if lovr.headset.wasPressed( "left", "trigger" ) then
-			util.create_mothership_intro( "left" )
+			util.create_mothership_intro( "left", invincible )
 		elseif lovr.headset.wasPressed( "right", "trigger" ) then
-			util.create_mothership_intro( "right" )
+			util.create_mothership_intro( "right", invincible )
 		end
 	elseif game_state == GAME_STATE.MOTHERSHIP_INTRO then
 		if lovr.headset.wasPressed( player.hand, "trigger" ) then
@@ -191,6 +197,7 @@ function lovr.draw( pass )
 	elseif game_state == GAME_STATE.GAME_OVER then
 		pass:setShader()
 		pass:text( "GAME OVER", vec3( 0, 1.2, -2 ), METRICS.TEXT_SCALE_BIG )
+		pass:text( "[Press trigger to restart]", vec3( 0, 1.1, -2 ), METRICS.TEXT_SCALE_SMALL )
 		pass:setShader( assets[ ASSET_TYPE.SHADER_PBR ] )
 	end
 

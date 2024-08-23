@@ -186,7 +186,8 @@ player = {
 	gate_open = false,
 	doh_hit_timer =
 		timer( true ),
-	doh_hits = 0
+	doh_hits = 0,
+	invincible = false
 }
 level_intro_timer = timer( false )
 cur_level = 32

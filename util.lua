@@ -83,8 +83,10 @@ function util.setup_room_colliders( collider )
 	local back = world:newBoxCollider( 0, (METRICS.ROOM_HEIGHT / 2), (-METRICS.ROOM_DEPTH - half_thickness) + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_WIDTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
 	back:setTag( "wall_far" )
 
-	-- local front = world:newBoxCollider( 0, (METRICS.ROOM_HEIGHT / 2), half_thickness + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_WIDTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
-	-- front:setTag( "wall_near" )
+	if player.invincible then
+		local front = world:newBoxCollider( 0, (METRICS.ROOM_HEIGHT / 2), half_thickness + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_WIDTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
+		front:setTag( "wall_near" )
+	end
 
 	table.insert( room_colliders, right )
 	table.insert( room_colliders, left )
@@ -158,6 +160,17 @@ function util.generate_level()
 end
 
 function util.create_start_screen()
+	gameobject.destroy_all()
+	powerup.owned = nil
+	powerup.falling = nil
+	player.paddle_cooldown_timer:stop()
+	player.laser_cooldown_timer:stop()
+	player.gate_open = false
+	player.lives = 3
+	player.score = 0
+	player.doh_hits = 0
+	powerup.timer:stop()
+
 	obj_arkanoid_logo = gameobject( vec3( 0, 2, -2 ), ASSET_TYPE.ARKANOID_LOGO )
 	obj_taito_logo = gameobject( vec3( 0, 0.65, -2 ), ASSET_TYPE.TAITO_LOGO )
 	game_state = GAME_STATE.START_SCREEN
@@ -174,7 +187,8 @@ function util.point_in_volume( px, py, pz, vx, vy, vz, vw, vh, vd )
 	return false
 end
 
-function util.create_mothership_intro( hand )
+function util.create_mothership_intro( hand, invincible )
+	if invincible then player.invincible = true end
 	player.hand = hand
 	obj_arkanoid_logo:destroy()
 	obj_taito_logo:destroy()
