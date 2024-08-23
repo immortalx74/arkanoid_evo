@@ -123,8 +123,9 @@ function collision.ball_to_doh( cur_ball )
 				end
 
 				player.doh_hits = player.doh_hits + 1
-				print( player.doh_hits )
 				player.doh_hit_timer:start()
+				assets[ ASSET_TYPE.SND_DOH_HIT ]:stop()
+				assets[ ASSET_TYPE.SND_DOH_HIT ]:play()
 				return
 			end
 		end

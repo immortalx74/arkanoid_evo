@@ -16,6 +16,41 @@ end
 function lovr.update( dt )
 	if game_state == GAME_STATE.INIT then
 		util.create_start_screen()
+	elseif game_state == GAME_STATE.ENDING then
+		if lovr.headset.wasPressed( player.hand, "trigger" ) then
+			assets[ ASSET_TYPE.SND_ENDING_THEME ]:stop()
+			game_state = GAME_STATE.INIT
+		end
+
+		if phrases_ending[ phrases_ending.idx ]:has_finished() then
+			if phrases_ending.idx < #phrases_ending then
+				if phrases_ending.idx == 4 or phrases_ending.idx == 6 then
+					if not phrases_ending.between_timer.started then
+						phrases_ending.between_timer:start()
+					end
+				else
+					phrases_ending.idx = phrases_ending.idx + 1
+				end
+
+				if phrases_ending.between_timer:get_elapsed() > 0.5 then
+					phrases_ending.between_timer:stop()
+					phrases_ending.idx = phrases_ending.idx + 1
+				end
+
+				phrases_ending[ phrases_ending.idx ]:start()
+			else
+				if not phrases_ending.last_timer.started then
+					phrases_ending.last_timer:start()
+				end
+			end
+		end
+
+		if phrases_ending.idx == 9 and phrases_ending.last_timer:get_elapsed() > 5 then
+			enemy_ship_timer:stop()
+			-- game_state = GAME_STATE.GENERATE_LEVEL
+		elseif phrases_ending.idx == 9 and phrases_ending.last_timer:get_elapsed() > 2 then
+			enemy_ship_timer:stop()
+		end
 	elseif game_state == GAME_STATE.GAME_OVER then
 		if lovr.headset.wasPressed( player.hand, "trigger" ) then
 			cur_level = 1
@@ -52,33 +87,33 @@ function lovr.update( dt )
 			game_state = GAME_STATE.GENERATE_LEVEL
 		end
 
-		if phrases[ phrases.idx ]:has_finished() then
-			if phrases.idx < #phrases then
-				if phrases.idx == 2 or phrases.idx == 6 then
-					if not phrases.between_timer.started then
-						phrases.between_timer:start()
+		if phrases_intro[ phrases_intro.idx ]:has_finished() then
+			if phrases_intro.idx < #phrases_intro then
+				if phrases_intro.idx == 2 or phrases_intro.idx == 6 then
+					if not phrases_intro.between_timer.started then
+						phrases_intro.between_timer:start()
 					end
 				else
-					phrases.idx = phrases.idx + 1
+					phrases_intro.idx = phrases_intro.idx + 1
 				end
 
-				if phrases.between_timer:get_elapsed() > 0.5 then
-					phrases.between_timer:stop()
-					phrases.idx = phrases.idx + 1
+				if phrases_intro.between_timer:get_elapsed() > 0.5 then
+					phrases_intro.between_timer:stop()
+					phrases_intro.idx = phrases_intro.idx + 1
 				end
 
-				phrases[ phrases.idx ]:start()
+				phrases_intro[ phrases_intro.idx ]:start()
 			else
-				if not phrases.last_timer.started then
-					phrases.last_timer:start()
+				if not phrases_intro.last_timer.started then
+					phrases_intro.last_timer:start()
 				end
 			end
 		end
 
-		if phrases.idx == 9 and phrases.last_timer:get_elapsed() > 5 then
+		if phrases_intro.idx == 9 and phrases_intro.last_timer:get_elapsed() > 5 then
 			enemy_ship_timer:stop()
 			game_state = GAME_STATE.GENERATE_LEVEL
-		elseif phrases.idx == 9 and phrases.last_timer:get_elapsed() > 2 and not assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:isPlaying() then
+		elseif phrases_intro.idx == 9 and phrases_intro.last_timer:get_elapsed() > 2 and not assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:isPlaying() then
 			assets[ ASSET_TYPE.SND_PADDLE_AWAY ]:play()
 			enemy_ship_timer:stop()
 		end
@@ -135,7 +170,9 @@ function lovr.update( dt )
 		end
 
 		if player.doh_hits >= METRICS.DOH_STRENGTH then
-			game_state = GAME_STATE.DEFEAT_DOH
+			game_state = GAME_STATE.ENDING
+			util.create_ending()
+			enemy_ship_timer:start()
 		end
 	end
 
@@ -144,7 +181,7 @@ function lovr.update( dt )
 		player.high_score = player.score
 	end
 
-	if game_state ~= GAME_STATE.EXIT_GATE and game_state ~= GAME_STATE.DEFEAT_DOH then
+	if game_state ~= GAME_STATE.EXIT_GATE and game_state ~= GAME_STATE.ENDING then
 		gameobject.update_all( dt )
 	end
 end
@@ -165,24 +202,43 @@ function lovr.draw( pass )
 		pass:text( "ALL RIGHTS RESERVED", vec3( 0, 0.4, -2 ), METRICS.TEXT_SCALE_BIG )
 		pass:text( "This is a free, open source project made for fun.", vec3( 0, 0.3, -2 ), METRICS.TEXT_SCALE_SMALL )
 		pass:text( "No copyright infringement is intended", vec3( 0, 0.25, -2 ), METRICS.TEXT_SCALE_SMALL )
+	elseif game_state == GAME_STATE.ENDING then
+		pass:setShader()
+		obj_enemy_ship.model:animate( 1, obj_enemy_ship.model:getAnimationDuration( 1 ) - enemy_ship_timer:get_elapsed() )
+		obj_enemy_laser_beam.model:animate( 1, obj_enemy_laser_beam.model:getAnimationDuration( 1 ) - enemy_ship_timer:get_elapsed() )
+		obj_paddle_escape.model:animate( 1, obj_paddle_escape.model:getAnimationDuration( 1 ) - enemy_ship_timer:get_elapsed() )
+
+		if phrases_ending.idx < 5 then
+			phrases_ending[ 1 ]:draw( pass )
+			phrases_ending[ 2 ]:draw( pass )
+			phrases_ending[ 3 ]:draw( pass )
+			phrases_ending[ 4 ]:draw( pass )
+		elseif phrases_ending.idx < 7 then
+			phrases_ending[ 5 ]:draw( pass )
+			phrases_ending[ 6 ]:draw( pass )
+		else
+			phrases_ending[ 7 ]:draw( pass )
+			phrases_ending[ 8 ]:draw( pass )
+			phrases_ending[ 9 ]:draw( pass )
+		end
 	elseif game_state == GAME_STATE.MOTHERSHIP_INTRO then
 		pass:setShader()
 		obj_enemy_ship.model:animate( 1, enemy_ship_timer:get_elapsed() )
 		obj_enemy_laser_beam.model:animate( 1, enemy_ship_timer:get_elapsed() )
 		obj_paddle_escape.model:animate( 1, enemy_ship_timer:get_elapsed() )
 
-		if phrases.idx < 3 then
-			phrases[ 1 ]:draw( pass )
-			phrases[ 2 ]:draw( pass )
-		elseif phrases.idx < 7 then
-			phrases[ 3 ]:draw( pass )
-			phrases[ 4 ]:draw( pass )
-			phrases[ 5 ]:draw( pass )
-			phrases[ 6 ]:draw( pass )
+		if phrases_intro.idx < 3 then
+			phrases_intro[ 1 ]:draw( pass )
+			phrases_intro[ 2 ]:draw( pass )
+		elseif phrases_intro.idx < 7 then
+			phrases_intro[ 3 ]:draw( pass )
+			phrases_intro[ 4 ]:draw( pass )
+			phrases_intro[ 5 ]:draw( pass )
+			phrases_intro[ 6 ]:draw( pass )
 		else
-			phrases[ 7 ]:draw( pass )
-			phrases[ 8 ]:draw( pass )
-			phrases[ 9 ]:draw( pass )
+			phrases_intro[ 7 ]:draw( pass )
+			phrases_intro[ 8 ]:draw( pass )
+			phrases_intro[ 9 ]:draw( pass )
 		end
 	elseif game_state == GAME_STATE.PLAY then
 		-- phywire.draw( pass, world )

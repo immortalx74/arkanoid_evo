@@ -4,7 +4,6 @@
 -- "owned" powerup shouldn't change when catching life powerup
 -- prevent ball "extreme" reflection angles from paddle (favor Z direction)
 -- Consider making back of room a window instead of completely empty space
--- Do end sequence
 
 package.loaded[ ... ] = "globals"
 
@@ -43,35 +42,37 @@ ASSET_TYPE = {
 	SND_PADDLE_AWAY = 26,
 	SND_PADDLE_TURN_BIG = 27,
 	SND_GAME_OVER = 28,
-	POWERUP_B = 29,
-	POWERUP_C = 30,
-	POWERUP_D = 31,
-	POWERUP_E = 32,
-	POWERUP_L = 33,
-	POWERUP_P = 34,
-	POWERUP_S = 35,
-	PADDLE_BIG = 36,
-	PADDLE_TOP_BIG = 37,
-	PADDLE_SPINNER_BIG = 38,
-	PADDLE_LASER = 39,
-	PROJECTILE = 40,
-	ARKANOID_LOGO = 41,
-	MOTHERSHIP = 42,
-	TAITO_LOGO = 43,
-	FONT = 44,
-	ENEMY_SHIP = 45,
-	ENEMY_LASER_BEAM = 46,
-	PADDLE_ESCAPE = 47,
-	SHADER_UNLIT = 48,
-	ENEMY_BALOONS = 49,
-	ENEMY_CONE = 50,
-	ENEMY_PYRAMID = 51,
-	FEET_MARK = 52,
-	EXIT_GATE = 53,
-	LIFE_ICON = 54,
-	EXIT_GATE_COLUMN = 55,
-	DOH = 56,
-	DOH_COLLISION = 57,
+	SND_DOH_HIT = 29,
+	SND_ENDING_THEME = 30,
+	POWERUP_B = 31,
+	POWERUP_C = 32,
+	POWERUP_D = 33,
+	POWERUP_E = 34,
+	POWERUP_L = 35,
+	POWERUP_P = 36,
+	POWERUP_S = 37,
+	PADDLE_BIG = 38,
+	PADDLE_TOP_BIG = 39,
+	PADDLE_SPINNER_BIG = 40,
+	PADDLE_LASER = 41,
+	PROJECTILE = 42,
+	ARKANOID_LOGO = 43,
+	MOTHERSHIP = 44,
+	TAITO_LOGO = 45,
+	FONT = 46,
+	ENEMY_SHIP = 47,
+	ENEMY_LASER_BEAM = 48,
+	PADDLE_ESCAPE = 49,
+	SHADER_UNLIT = 50,
+	ENEMY_BALOONS = 51,
+	ENEMY_CONE = 52,
+	ENEMY_PYRAMID = 53,
+	FEET_MARK = 54,
+	EXIT_GATE = 55,
+	LIFE_ICON = 56,
+	EXIT_GATE_COLUMN = 57,
+	DOH = 58,
+	DOH_COLLISION = 59,
 }
 
 GAME_STATE = {
@@ -82,9 +83,9 @@ GAME_STATE = {
 	LEVEL_INTRO = 5,
 	PLAY = 6,
 	EXIT_GATE = 7,
-	DEFEAT_DOH = 8,
+	ENDING = 8,
 	LOST_LIFE = 9,
-	GAME_OVER = 10
+	GAME_OVER = 10,
 }
 
 BRICK_COLORS = {
@@ -163,7 +164,7 @@ METRICS = {
 	BALL_SPEED_NORMAL = 2.8,
 	BALL_SPEED_SLOW = 1.8,
 
-	DOH_STRENGTH = 4
+	DOH_STRENGTH = 1
 }
 
 obj_arkanoid_logo = nil
@@ -190,7 +191,7 @@ player = {
 	invincible = false
 }
 level_intro_timer = timer( false )
-cur_level = 32
+cur_level = 33
 
 world = lovr.physics.newWorld( {
 	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile", "exit_gate", "doh" },
@@ -217,18 +218,31 @@ phywire.options.wireframe = true
 phywire.options.overdraw = true
 math.randomseed( os.time() )
 
-phrases = { idx = 1, last_timer = timer( false ), between_timer = timer( false ) }
-table.insert( phrases, typewriter( "THE ERA AND TIME OF", vec3( -0.5, 1.5, -2 ), 0.02, true ) )
-table.insert( phrases, typewriter( "THIS STORY IS UNKNOWN.", vec3( -0.5, 1.4, -2 ), 0.02, false ) )
+phrases_intro = { idx = 1, last_timer = timer( false ), between_timer = timer( false ) }
+table.insert( phrases_intro, typewriter( "THE ERA AND TIME OF", vec3( -0.5, 1.5, -2 ), 0.02, true ) )
+table.insert( phrases_intro, typewriter( "THIS STORY IS UNKNOWN.", vec3( -0.5, 1.4, -2 ), 0.02, false ) )
 
-table.insert( phrases, typewriter( "AFTER THE MOTHERSHIP", vec3( -0.5, 1.5, -2 ), 0.02, false ) )
-table.insert( phrases, typewriter( '"ARKANOID" WAS DESTROYED,', vec3( -0.5, 1.4, -2 ), 0.02, false ) )
-table.insert( phrases, typewriter( 'A SPACECRAFT "VAUS"', vec3( -0.5, 1.3, -2 ), 0.02, false ) )
-table.insert( phrases, typewriter( "SCRAMBLED AWAY FROM IT.", vec3( -0.5, 1.2, -2 ), 0.02, false ) )
+table.insert( phrases_intro, typewriter( "AFTER THE MOTHERSHIP", vec3( -0.5, 1.5, -2 ), 0.02, false ) )
+table.insert( phrases_intro, typewriter( '"ARKANOID" WAS DESTROYED,', vec3( -0.5, 1.4, -2 ), 0.02, false ) )
+table.insert( phrases_intro, typewriter( 'A SPACECRAFT "VAUS"', vec3( -0.5, 1.3, -2 ), 0.02, false ) )
+table.insert( phrases_intro, typewriter( "SCRAMBLED AWAY FROM IT.", vec3( -0.5, 1.2, -2 ), 0.02, false ) )
 
-table.insert( phrases, typewriter( "BUT ONLY TO BE", vec3( -0.5, 1.5, -2 ), 0.02, false ) )
-table.insert( phrases, typewriter( "TRAPPED IN SPACE WARPED", vec3( -0.5, 1.4, -2 ), 0.02, false ) )
-table.insert( phrases, typewriter( "BY SOMEONE........", vec3( -0.5, 1.3, -2 ), 0.02, false ) )
+table.insert( phrases_intro, typewriter( "BUT ONLY TO BE", vec3( -0.5, 1.5, -2 ), 0.02, false ) )
+table.insert( phrases_intro, typewriter( "TRAPPED IN SPACE WARPED", vec3( -0.5, 1.4, -2 ), 0.02, false ) )
+table.insert( phrases_intro, typewriter( "BY SOMEONE........", vec3( -0.5, 1.3, -2 ), 0.02, false ) )
+
+phrases_ending = { idx = 1, last_timer = timer( false ), between_timer = timer( false ) }
+table.insert( phrases_ending, typewriter( "DIMENSION-CONTROLLING FORT", vec3( -0.5, 1.5, -2 ), 0.02, true ) )
+table.insert( phrases_ending, typewriter( '"DOH" HAS NOW BEEN', vec3( -0.5, 1.4, -2 ), 0.02, false ) )
+table.insert( phrases_ending, typewriter( "DEMOLISHED, AND TIME", vec3( -0.5, 1.3, -2 ), 0.02, false ) )
+table.insert( phrases_ending, typewriter( "AND TIME STARTED FLOWING REVERSELY.", vec3( -0.5, 1.2, -2 ), 0.02, false ) )
+
+table.insert( phrases_ending, typewriter( '"VAUS" MANAGED TO ESCAPE', vec3( -0.5, 1.5, -2 ), 0.02, true ) )
+table.insert( phrases_ending, typewriter( "FROM THE DISTORTED SPACE.", vec3( -0.5, 1.4, -2 ), 0.02, false ) )
+
+table.insert( phrases_ending, typewriter( "BUT THE REAL VOYAGE OF", vec3( -0.5, 1.5, -2 ), 0.02, true ) )
+table.insert( phrases_ending, typewriter( '"ARKANOID" IN THE GALAXY', vec3( -0.5, 1.4, -2 ), 0.02, false ) )
+table.insert( phrases_ending, typewriter( "HAS ONLY STARTED......", vec3( -0.5, 1.3, -2 ), 0.02, false ) )
 
 starfield = { points = {} }
 wanderers = {}

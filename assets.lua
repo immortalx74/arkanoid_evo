@@ -55,6 +55,8 @@ function assets.load()
 	assets[ ASSET_TYPE.SND_PADDLE_AWAY ] = lovr.audio.newSource( "res/sounds/paddle_away.wav" )
 	assets[ ASSET_TYPE.SND_PADDLE_TURN_BIG ] = lovr.audio.newSource( "res/sounds/paddle_turn_big.wav" )
 	assets[ ASSET_TYPE.SND_GAME_OVER ] = lovr.audio.newSource( "res/sounds/game_over.wav" )
+	assets[ ASSET_TYPE.SND_DOH_HIT ] = lovr.audio.newSource( "res/sounds/doh_hit.wav" )
+	assets[ ASSET_TYPE.SND_ENDING_THEME ] = lovr.audio.newSource( "res/sounds/ending_theme.wav" )
 
 	-- NOTE: Maybe set all to no looping?
 	assets[ ASSET_TYPE.SND_LOST_LIFE ]:setLooping( false )

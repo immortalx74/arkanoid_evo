@@ -206,6 +206,18 @@ function util.create_mothership_intro( hand, invincible )
 	game_state = GAME_STATE.MOTHERSHIP_INTRO
 end
 
+function util.create_ending()
+	gameobject.destroy_all()
+	
+	obj_mothership = gameobject( vec3( 0, -0.8, -3 ), ASSET_TYPE.MOTHERSHIP )
+	obj_mothership.pose:rotate( -0.8, 0, 1, 0 )
+
+	obj_enemy_ship = gameobject( vec3( 0, -0.8, -3 ), ASSET_TYPE.ENEMY_SHIP )
+	obj_enemy_laser_beam = gameobject( vec3( 0, -0.8, -3 ), ASSET_TYPE.ENEMY_LASER_BEAM )
+	obj_paddle_escape = gameobject( vec3( 0, -0.87, -3 ), ASSET_TYPE.PADDLE_ESCAPE )
+	assets[ ASSET_TYPE.SND_ENDING_THEME ]:play()
+end
+
 function util.create_starfield()
 	for i = 1, 1000 do
 		local rx = math.random( -10, 10 )
