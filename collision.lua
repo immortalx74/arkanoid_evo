@@ -115,7 +115,7 @@ function collision.ball_to_doh( cur_ball )
 
 			if normal then
 				cur_ball.pose:translate( -nx, -ny, -nz )
-				-- NOTE: I don't even know why I have to do this!
+				-- NOTE: I don't even know why I have to do this! (reversing direction only on right side of model? )
 				if x > 0 then
 					cur_ball.direction:set( util.reflection_vector( -normal, -cur_ball.direction ) )
 				else
@@ -126,10 +126,12 @@ function collision.ball_to_doh( cur_ball )
 				player.doh_hit_timer:start()
 				assets[ ASSET_TYPE.SND_DOH_HIT ]:stop()
 				assets[ ASSET_TYPE.SND_DOH_HIT ]:play()
-				return
+				return true
 			end
 		end
 	end
+
+	return false
 end
 
 function collision.ball_to_paddle( cur_ball )

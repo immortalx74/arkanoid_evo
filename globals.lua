@@ -4,6 +4,9 @@
 -- "owned" powerup shouldn't change when catching life powerup
 -- prevent ball "extreme" reflection angles from paddle (favor Z direction)
 -- Consider making back of room a window instead of completely empty space
+-- Should owned powerup be lost when losing life?
+-- Fix game over restart (keeps playing old sounds)
+-- Do a temp fix for the gate collider (it's a Jolt or LOVR bug)
 
 package.loaded[ ... ] = "globals"
 
@@ -164,7 +167,7 @@ METRICS = {
 	BALL_SPEED_NORMAL = 2.8,
 	BALL_SPEED_SLOW = 1.8,
 
-	DOH_STRENGTH = 1
+	DOH_STRENGTH = 4
 }
 
 obj_arkanoid_logo = nil
@@ -191,7 +194,7 @@ player = {
 	invincible = false
 }
 level_intro_timer = timer( false )
-cur_level = 33
+cur_level = 1
 
 world = lovr.physics.newWorld( {
 	tags = { "ball", "brick", "paddle", "wall_right", "wall_left", "wall_top", "wall_bottom", "wall_far", "wall_near", "powerup", "projectile", "exit_gate", "doh" },

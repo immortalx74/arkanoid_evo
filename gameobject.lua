@@ -136,7 +136,10 @@ function gameobject:update( dt )
 			collision.ball_to_brick( self )
 			collision.ball_to_wall( self )
 			if cur_level == 33 then
-				collision.ball_to_doh( self )
+				local hit = collision.ball_to_doh( self )
+				if hit then
+					break
+				end
 			end
 			local hit = collision.ball_to_paddle( self )
 			if hit then
