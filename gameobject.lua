@@ -145,6 +145,12 @@ function gameobject:update( dt )
 				end
 				break
 			end
+
+			local x, y, z = self.pose:getPosition()
+			if z > METRICS.ROOM_OFFSET_Z + 0.2 then
+				self:destroy()
+				return
+			end
 		end
 	elseif self.type >= ASSET_TYPE.POWERUP_B and self.type <= ASSET_TYPE.POWERUP_S then
 		if vec3( self.pose ).z < METRICS.ROOM_OFFSET_Z then
@@ -225,7 +231,13 @@ function gameobject:draw( pass )
 		self.type >= ASSET_TYPE.POWERUP_B and self.type <= ASSET_TYPE.POWERUP_S
 
 	if animated_models then
-		self.model:animate( 1, lovr.timer.getTime() )
+		if self.type >= ASSET_TYPE.ENEMY_BALOONS and self.type <= ASSET_TYPE.ENEMY_PYRAMID then
+			if game_state == GAME_STATE.PLAY then
+				self.model:animate( 1, lovr.timer.getTime() )
+			end
+		else
+			self.model:animate( 1, lovr.timer.getTime() )
+		end
 	elseif self.type == ASSET_TYPE.PADDLE or self.type == ASSET_TYPE.PADDLE_BIG or self.type == ASSET_TYPE.PADDLE_LASER then
 		local count = self.model:getAnimationCount()
 		for i = 1, count do
@@ -235,7 +247,6 @@ function gameobject:draw( pass )
 		local v = vec3( self.pose )
 		pass:circle( v.x, 0, v.z, 0.03, -math.pi / 2, 1, 0, 0 )
 	elseif self.type == ASSET_TYPE.DOH then
-		-- pass:setColor( 0.5,0,0 )
 		if player.doh_hit_timer:get_elapsed() < 0.1 then
 			pass:setColor( 1, 0, 0 )
 		else

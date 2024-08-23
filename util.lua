@@ -83,8 +83,8 @@ function util.setup_room_colliders( collider )
 	local back = world:newBoxCollider( 0, (METRICS.ROOM_HEIGHT / 2), (-METRICS.ROOM_DEPTH - half_thickness) + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_WIDTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
 	back:setTag( "wall_far" )
 
-	local front = world:newBoxCollider( 0, (METRICS.ROOM_HEIGHT / 2), half_thickness + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_WIDTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
-	front:setTag( "wall_near" )
+	-- local front = world:newBoxCollider( 0, (METRICS.ROOM_HEIGHT / 2), half_thickness + METRICS.ROOM_OFFSET_Z, METRICS.ROOM_WIDTH, METRICS.ROOM_HEIGHT, METRICS.WALL_THICKNESS )
+	-- front:setTag( "wall_near" )
 
 	table.insert( room_colliders, right )
 	table.insert( room_colliders, left )
@@ -220,7 +220,7 @@ function util.move_starfield( dt )
 end
 
 function util.draw_starfield( pass )
-	if game_state == GAME_STATE.LEVEL_INTRO or game_state == GAME_STATE.PLAY then
+	if game_state == GAME_STATE.LEVEL_INTRO or game_state == GAME_STATE.PLAY or game_state == GAME_STATE.LOST_LIFE or game_state == GAME_STATE.GAME_OVER then
 		pass:setShader( assets[ ASSET_TYPE.SHADER_UNLIT ] )
 		pass:setColor( 1, 1, 1 )
 		pass:points( starfield.points )

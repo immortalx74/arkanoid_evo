@@ -4,6 +4,7 @@
 -- "owned" powerup shouldn't change when catching life powerup
 -- prevent ball "extreme" reflection angles from paddle (favor Z direction)
 -- Consider making back of room a window instead of completely empty space
+-- Do end sequence
 
 package.loaded[ ... ] = "globals"
 
@@ -41,35 +42,36 @@ ASSET_TYPE = {
 	SND_MOTHERSHIP_INTRO = 25,
 	SND_PADDLE_AWAY = 26,
 	SND_PADDLE_TURN_BIG = 27,
-	POWERUP_B = 28,
-	POWERUP_C = 29,
-	POWERUP_D = 30,
-	POWERUP_E = 31,
-	POWERUP_L = 32,
-	POWERUP_P = 33,
-	POWERUP_S = 34,
-	PADDLE_BIG = 35,
-	PADDLE_TOP_BIG = 36,
-	PADDLE_SPINNER_BIG = 37,
-	PADDLE_LASER = 38,
-	PROJECTILE = 39,
-	ARKANOID_LOGO = 40,
-	MOTHERSHIP = 41,
-	TAITO_LOGO = 42,
-	FONT = 43,
-	ENEMY_SHIP = 44,
-	ENEMY_LASER_BEAM = 45,
-	PADDLE_ESCAPE = 46,
-	SHADER_UNLIT = 47,
-	ENEMY_BALOONS = 48,
-	ENEMY_CONE = 49,
-	ENEMY_PYRAMID = 50,
-	FEET_MARK = 51,
-	EXIT_GATE = 52,
-	LIFE_ICON = 53,
-	EXIT_GATE_COLUMN = 54,
-	DOH = 55,
-	DOH_COLLISION = 56,
+	SND_GAME_OVER = 28,
+	POWERUP_B = 29,
+	POWERUP_C = 30,
+	POWERUP_D = 31,
+	POWERUP_E = 32,
+	POWERUP_L = 33,
+	POWERUP_P = 34,
+	POWERUP_S = 35,
+	PADDLE_BIG = 36,
+	PADDLE_TOP_BIG = 37,
+	PADDLE_SPINNER_BIG = 38,
+	PADDLE_LASER = 39,
+	PROJECTILE = 40,
+	ARKANOID_LOGO = 41,
+	MOTHERSHIP = 42,
+	TAITO_LOGO = 43,
+	FONT = 44,
+	ENEMY_SHIP = 45,
+	ENEMY_LASER_BEAM = 46,
+	PADDLE_ESCAPE = 47,
+	SHADER_UNLIT = 48,
+	ENEMY_BALOONS = 49,
+	ENEMY_CONE = 50,
+	ENEMY_PYRAMID = 51,
+	FEET_MARK = 52,
+	EXIT_GATE = 53,
+	LIFE_ICON = 54,
+	EXIT_GATE_COLUMN = 55,
+	DOH = 56,
+	DOH_COLLISION = 57,
 }
 
 GAME_STATE = {
@@ -80,7 +82,9 @@ GAME_STATE = {
 	LEVEL_INTRO = 5,
 	PLAY = 6,
 	EXIT_GATE = 7,
-	DEFEAT_DOH = 8
+	DEFEAT_DOH = 8,
+	LOST_LIFE = 9,
+	GAME_OVER = 10
 }
 
 BRICK_COLORS = {
@@ -165,7 +169,6 @@ METRICS = {
 obj_arkanoid_logo = nil
 obj_taito_logo = nil
 obj_mothership = nil
-
 
 gameobjects_list = {}
 game_state = GAME_STATE.INIT

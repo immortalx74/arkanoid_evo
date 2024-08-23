@@ -16,6 +16,20 @@ end
 function lovr.update( dt )
 	if game_state == GAME_STATE.INIT then
 		util.create_start_screen()
+	elseif game_state == GAME_STATE.LOST_LIFE then
+		if not assets[ ASSET_TYPE.SND_LOST_LIFE ]:isPlaying() then
+			if player.lives == 0 then
+				game_state = GAME_STATE.GAME_OVER
+				if not assets[ ASSET_TYPE.SND_GAME_OVER ]:isPlaying() then
+					assets[ ASSET_TYPE.SND_GAME_OVER ]:play()
+				end
+			else
+				game_state = GAME_STATE.LEVEL_INTRO
+				level_intro_timer:start()
+				assets[ ASSET_TYPE.SND_LEVEL_INTRO ]:stop()
+				assets[ ASSET_TYPE.SND_LEVEL_INTRO ]:play()
+			end
+		end
 	elseif game_state == GAME_STATE.EXIT_GATE then
 		if not assets[ ASSET_TYPE.SND_ESCAPE_LEVEL ]:isPlaying() then
 			game_state = GAME_STATE.GENERATE_LEVEL
@@ -102,8 +116,15 @@ function lovr.update( dt )
 			if cur_level < num_levels then
 				cur_level = cur_level + 1
 				game_state = GAME_STATE.GENERATE_LEVEL
-			else
-				-- NOTE Do Doh level here
+			end
+		end
+
+		local num_balls_left = util.get_num_balls()
+		if num_balls_left == 0 then
+			game_state = GAME_STATE.LOST_LIFE
+			player.lives = player.lives - 1
+			if not assets[ ASSET_TYPE.SND_LOST_LIFE ]:isPlaying() then
+				assets[ ASSET_TYPE.SND_LOST_LIFE ]:play()
 			end
 		end
 
@@ -167,6 +188,10 @@ function lovr.draw( pass )
 		if level_intro_timer:get_elapsed() > 1 then
 			pass:text( "START", vec3( 0, 1.1, -2 ), METRICS.TEXT_SCALE_BIG )
 		end
+	elseif game_state == GAME_STATE.GAME_OVER then
+		pass:setShader()
+		pass:text( "GAME OVER", vec3( 0, 1.2, -2 ), METRICS.TEXT_SCALE_BIG )
+		pass:setShader( assets[ ASSET_TYPE.SHADER_PBR ] )
 	end
 
 	util.draw_starfield( pass )
