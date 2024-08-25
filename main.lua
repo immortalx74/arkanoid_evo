@@ -127,6 +127,7 @@ function lovr.update( dt )
 		if level_intro_timer:get_elapsed() > 3 then
 			local ball = gameobject( vec3( -0.8, 1.6, -1 ), ASSET_TYPE.BALL )
 			player.flashing_timer:start()
+			level_intro_timer:stop()
 			game_state = GAME_STATE.PLAY
 		end
 	elseif game_state == GAME_STATE.PLAY then

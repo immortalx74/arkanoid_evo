@@ -13,7 +13,7 @@ function typewriter:new( text, position, interval, auto_start )
 	obj.interval = interval
 	obj.cursor = 1
 	obj.started = auto_start or false
-	obj.timer = timer( auto_start)
+	obj.timer = timer( auto_start )
 	obj.finished = false
 	return obj
 end
@@ -21,6 +21,14 @@ end
 function typewriter:start()
 	self.started = true
 	self.timer:start()
+end
+
+function typewriter:reset()
+	self.started = false
+	self.timer:stop()
+	self.text_writer = ""
+	self.cursor = 1
+	self.finished = false
 end
 
 function typewriter:has_finished()

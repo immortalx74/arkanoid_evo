@@ -170,6 +170,25 @@ function util.create_start_screen()
 	player.score = 0
 	player.doh_hits = 0
 	powerup.timer:stop()
+	phrases_intro.idx = 1
+	phrases_ending.idx = 1
+	phrases_intro.between_timer:stop()
+	phrases_intro.last_timer:stop()
+	phrases_ending.between_timer:stop()
+	phrases_ending.last_timer:stop()
+	for i, v in ipairs( phrases_intro ) do
+		v:reset()
+		if i == 1 then
+			v:start()
+		end
+	end
+
+	for i, v in ipairs( phrases_ending ) do
+		v:reset()
+		if i == 1 then
+			v:start()
+		end
+	end
 
 	obj_arkanoid_logo = gameobject( vec3( 0, 2, -2 ), ASSET_TYPE.ARKANOID_LOGO )
 	obj_taito_logo = gameobject( vec3( 0, 0.65, -2 ), ASSET_TYPE.TAITO_LOGO )
@@ -198,7 +217,11 @@ function util.create_mothership_intro( hand, invincible )
 	obj_enemy_ship = gameobject( vec3( 0, -0.8, -3 ), ASSET_TYPE.ENEMY_SHIP )
 	obj_enemy_laser_beam = gameobject( vec3( 0, -0.8, -3 ), ASSET_TYPE.ENEMY_LASER_BEAM )
 	obj_paddle_escape = gameobject( vec3( 0, -0.87, -3 ), ASSET_TYPE.PADDLE_ESCAPE )
-	enemy_ship_timer = timer( true )
+	if not enemy_ship_timer then
+		enemy_ship_timer = timer( true )
+	else
+		enemy_ship_timer:start()
+	end
 
 	assets[ ASSET_TYPE.SND_MOTHERSHIP_INTRO ]:stop()
 	assets[ ASSET_TYPE.SND_MOTHERSHIP_INTRO ]:play()
@@ -208,7 +231,7 @@ end
 
 function util.create_ending()
 	gameobject.destroy_all()
-	
+
 	obj_mothership = gameobject( vec3( 0, -0.8, -3 ), ASSET_TYPE.MOTHERSHIP )
 	obj_mothership.pose:rotate( -0.8, 0, 1, 0 )
 

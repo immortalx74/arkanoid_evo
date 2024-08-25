@@ -167,7 +167,7 @@ METRICS = {
 	BALL_SPEED_NORMAL = 2.8,
 	BALL_SPEED_SLOW = 1.8,
 
-	DOH_STRENGTH = 4
+	DOH_STRENGTH = 15
 }
 
 obj_arkanoid_logo = nil
