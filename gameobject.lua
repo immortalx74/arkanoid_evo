@@ -82,12 +82,10 @@ function gameobject:new( pose, type, transparent, color, points )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )
 	elseif type == ASSET_TYPE.EXIT_GATE then
-		-- obj.collider = world:newCylinderCollider( vec3( obj.pose ), METRICS.EXIT_GATE_RADIUS, METRICS.ROOM_HEIGHT )
-		-- obj.collider:getShapes()[ 1 ]:setOffset( 0, METRICS.ROOM_HEIGHT / 2, 0, -math.pi / 2, 1, 0, 0 )
-		obj.collider = world:newCollider( vec3( obj.pose ) )
-		local shape = lovr.physics.newCylinderShape( METRICS.EXIT_GATE_RADIUS, METRICS.ROOM_HEIGHT )
-		shape:setOffset( 0, METRICS.ROOM_HEIGHT / 2, 0, math.pi / 2, 1, 0, 0 )
-		obj.collider:addShape( shape )
+		-- NOTE: As of dev/93268c, there's a LOVR or Jolt bug where cylinder-colliders sometimes don't respect offset.
+		-- Replacing with box collider for now
+		obj.collider = world:newBoxCollider( vec3( obj.pose ), vec3( (2 * METRICS.EXIT_GATE_RADIUS), METRICS.ROOM_HEIGHT, (2 * METRICS.EXIT_GATE_RADIUS) ) )
+		obj.collider:getShapes()[ 1 ]:setOffset( 0, METRICS.ROOM_HEIGHT / 2 )
 		obj.collider:setTag( "exit_gate" )
 		obj.collider:setUserData( obj )
 		obj.collider:setSensor( true )

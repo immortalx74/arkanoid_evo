@@ -3,10 +3,7 @@
 -- silver bricks start with strength = 2, increasing by 1 every 8 stages (a bit hard for VR though)
 -- "owned" powerup shouldn't change when catching life powerup
 -- prevent ball "extreme" reflection angles from paddle (favor Z direction)
--- Consider making back of room a window instead of completely empty space
 -- Should owned powerup be lost when losing life?
--- Fix game over restart (keeps playing old sounds)
--- Do a temp fix for the gate collider (it's a Jolt or LOVR bug)
 
 package.loaded[ ... ] = "globals"
 
